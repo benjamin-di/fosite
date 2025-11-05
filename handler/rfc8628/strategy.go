@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package rfc8628
@@ -22,6 +23,10 @@ type DeviceRateLimitStrategy interface {
 	ShouldRateLimit(ctx context.Context, code string) (bool, error)
 }
 
+type DeviceRateLimitStrategyProvider interface {
+	DeviceRateLimitStrategy() DeviceRateLimitStrategy
+}
+
 // DeviceCodeStrategy handles the device_code strategy
 type DeviceCodeStrategy interface {
 	// DeviceCodeSignature calculates the signature of a device_code
@@ -34,6 +39,10 @@ type DeviceCodeStrategy interface {
 	ValidateDeviceCode(ctx context.Context, r fosite.DeviceRequester, code string) (err error)
 }
 
+type DeviceCodeStrategyProvider interface {
+	DeviceCodeStrategy() DeviceCodeStrategy
+}
+
 // UserCodeStrategy handles the user_code strategy
 type UserCodeStrategy interface {
 	// UserCodeSignature calculates the signature of a user_code
@@ -44,4 +53,8 @@ type UserCodeStrategy interface {
 
 	// ValidateUserCode validates the user_code
 	ValidateUserCode(ctx context.Context, r fosite.DeviceRequester, code string) (err error)
+}
+
+type UserCodeStrategyProvider interface {
+	UserCodeStrategy() UserCodeStrategy
 }

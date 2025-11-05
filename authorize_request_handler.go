@@ -393,7 +393,7 @@ func (f *Fosite) authorizeRequestFromPAR(ctx context.Context, r *http.Request, r
 
 	clientID := r.Form.Get("client_id")
 
-	storage, ok := f.Store.(PARStorage)
+	storage, ok := f.Store.(PARStorageProvider)
 	if !ok {
 		return false, errorsx.WithStack(ErrServerError.WithHint(ErrorPARNotSupported).WithDebug(DebugPARStorageInvalid))
 	}
@@ -401,7 +401,7 @@ func (f *Fosite) authorizeRequestFromPAR(ctx context.Context, r *http.Request, r
 	// hydrate the requester
 	var parRequest AuthorizeRequester
 	var err error
-	if parRequest, err = storage.GetPARSession(ctx, requestURI); err != nil {
+	if parRequest, err = storage.PARStorage().GetPARSession(ctx, requestURI); err != nil {
 		return false, errorsx.WithStack(ErrInvalidRequestURI.WithHint("Invalid PAR session").WithWrap(err).WithDebug(err.Error()))
 	}
 
@@ -412,7 +412,7 @@ func (f *Fosite) authorizeRequestFromPAR(ctx context.Context, r *http.Request, r
 	request.State = parRequest.GetState()
 	request.ResponseMode = parRequest.GetResponseMode()
 
-	if err := storage.DeletePARSession(ctx, requestURI); err != nil {
+	if err := storage.PARStorage().DeletePARSession(ctx, requestURI); err != nil {
 		return false, errorsx.WithStack(ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 

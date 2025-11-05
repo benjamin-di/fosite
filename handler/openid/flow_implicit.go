@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package openid
@@ -16,7 +17,7 @@ import (
 type OpenIDConnectImplicitHandler struct {
 	*IDTokenHandleHelper
 
-	AuthorizeImplicitGrantTypeHandler *oauth2.AuthorizeImplicitGrantTypeHandler
+	AuthorizeImplicitGrantTypeHandler *oauth2.AuthorizeImplicitGrantHandler
 	OpenIDConnectRequestValidator     *OpenIDConnectRequestValidator
 	RS256JWTStrategy                  *jwt.DefaultSigner
 

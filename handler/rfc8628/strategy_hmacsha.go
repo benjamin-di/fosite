@@ -17,6 +17,12 @@ import (
 	enigma "github.com/ory/fosite/token/hmac"
 )
 
+var (
+	_ DeviceRateLimitStrategy = (*DefaultDeviceStrategy)(nil)
+	_ DeviceCodeStrategy      = (*DefaultDeviceStrategy)(nil)
+	_ UserCodeStrategy        = (*DefaultDeviceStrategy)(nil)
+)
+
 // DefaultDeviceStrategy implements the default device strategy
 type DefaultDeviceStrategy struct {
 	Enigma *enigma.HMACStrategy

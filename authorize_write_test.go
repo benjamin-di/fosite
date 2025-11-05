@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -23,7 +24,7 @@ func TestWriteAuthorizeResponse(t *testing.T) {
 	rw := NewMockResponseWriter(ctrl)
 	ar := NewMockAuthorizeRequester(ctrl)
 	resp := NewMockAuthorizeResponder(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	for k, c := range []struct {
 		setup  func()

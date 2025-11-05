@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -10,9 +11,9 @@ import (
 )
 
 type CoreStorage interface {
-	AuthorizeCodeStorage
-	AccessTokenStorage
-	RefreshTokenStorage
+	AuthorizeCodeStorageProvider
+	AccessTokenStorageProvider
+	RefreshTokenStorageProvider
 }
 
 // AuthorizeCodeStorage handles storage requests related to authorization codes.
@@ -32,6 +33,9 @@ type AuthorizeCodeStorage interface {
 	// ErrInvalidatedAuthorizeCode error.
 	InvalidateAuthorizeCodeSession(ctx context.Context, code string) (err error)
 }
+type AuthorizeCodeStorageProvider interface {
+	AuthorizeCodeStorage() AuthorizeCodeStorage
+}
 
 type AccessTokenStorage interface {
 	CreateAccessTokenSession(ctx context.Context, signature string, request fosite.Requester) (err error)
@@ -39,6 +43,10 @@ type AccessTokenStorage interface {
 	GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error)
 
 	DeleteAccessTokenSession(ctx context.Context, signature string) (err error)
+}
+
+type AccessTokenStorageProvider interface {
+	AccessTokenStorage() AccessTokenStorage
 }
 
 type RefreshTokenStorage interface {
@@ -49,4 +57,8 @@ type RefreshTokenStorage interface {
 	DeleteRefreshTokenSession(ctx context.Context, signature string) (err error)
 
 	RotateRefreshToken(ctx context.Context, requestID string, refreshTokenSignature string) (err error)
+}
+
+type RefreshTokenStorageProvider interface {
+	RefreshTokenStorage() RefreshTokenStorage
 }

@@ -37,7 +37,10 @@ func (f ClientResolverFunc) ResolveClient(ctx context.Context, clientID string, 
 
 // resolveClient applies the optional resolver around the configured client store.
 func (f *Fosite) resolveClient(ctx context.Context, clientID string) (Client, error) {
-	next := ClientLookupFunc(f.Store.GetClient)
+	// The store is only consulted when the resolver delegates to it.
+	next := ClientLookupFunc(func(ctx context.Context, clientID string) (Client, error) {
+		return f.Store.ClientManager().GetClient(ctx, clientID)
+	})
 	if provider, ok := f.Config.(ClientResolverProvider); ok {
 		if resolver := provider.GetClientResolver(ctx); resolver != nil {
 			return resolver.ResolveClient(ctx, clientID, next)

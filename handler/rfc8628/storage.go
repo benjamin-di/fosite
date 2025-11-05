@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package rfc8628
@@ -7,15 +8,7 @@ import (
 	"context"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
 )
-
-// RFC8628CoreStorage is the storage needed for the DeviceAuthHandler
-type RFC8628CoreStorage interface {
-	DeviceAuthStorage
-	oauth2.AccessTokenStorage
-	oauth2.RefreshTokenStorage
-}
 
 // DeviceAuthStorage handles the device auth session storage
 type DeviceAuthStorage interface {
@@ -33,4 +26,8 @@ type DeviceAuthStorage interface {
 	// code should be set to invalid and consecutive requests to GetDeviceCodeSession should return the
 	// ErrInvalidatedDeviceCode error.
 	InvalidateDeviceCodeSession(ctx context.Context, signature string) (err error)
+}
+
+type DeviceAuthStorageProvider interface {
+	DeviceAuthStorage() DeviceAuthStorage
 }

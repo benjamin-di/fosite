@@ -1,7 +1,8 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -14,6 +15,7 @@ import (
 	gomock "go.uber.org/mock/gomock"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/internal"
 )
 
@@ -24,7 +26,7 @@ func TestGetExpiresIn(t *testing.T) {
 			fosite.AccessToken: now.Add(time.Hour),
 		},
 	})
-	assert.Equal(t, time.Hour, getExpiresIn(r, fosite.AccessToken, time.Millisecond, now))
+	assert.Equal(t, time.Hour, oauth2.CallGetExpiresIn(r, fosite.AccessToken, time.Millisecond, now))
 }
 
 func TestIssueAccessToken(t *testing.T) {
@@ -33,10 +35,11 @@ func TestIssueAccessToken(t *testing.T) {
 	aresp := &fosite.AccessResponse{Extra: map[string]interface{}{}}
 	accessStrat := internal.NewMockAccessTokenStrategy(ctrl)
 	accessStore := internal.NewMockAccessTokenStorage(ctrl)
-	defer ctrl.Finish()
+	provider := internal.NewMockAccessTokenStorageProvider(ctrl)
+	t.Cleanup(ctrl.Finish)
 
-	helper := HandleHelper{
-		AccessTokenStorage:  accessStore,
+	helper := oauth2.HandleHelper{
+		Storage:             provider,
 		AccessTokenStrategy: accessStrat,
 		Config: &fosite.Config{
 			AccessTokenLifespan: time.Hour,
@@ -57,6 +60,7 @@ func TestIssueAccessToken(t *testing.T) {
 		{
 			mock: func() {
 				accessStrat.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return("token", "signature", nil)
+				provider.EXPECT().AccessTokenStorage().Return(accessStore).Times(1)
 				accessStore.EXPECT().CreateAccessTokenSession(gomock.Any(), "signature", gomock.Eq(areq.Sanitize([]string{}))).Return(errors.New(""))
 			},
 			err: errors.New(""),
@@ -64,6 +68,7 @@ func TestIssueAccessToken(t *testing.T) {
 		{
 			mock: func() {
 				accessStrat.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return("token", "signature", nil)
+				provider.EXPECT().AccessTokenStorage().Return(accessStore).Times(1)
 				accessStore.EXPECT().CreateAccessTokenSession(gomock.Any(), "signature", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 			},
 			err: nil,

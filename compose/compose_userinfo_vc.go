@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package compose
@@ -10,7 +11,7 @@ import (
 
 // OIDCUserinfoVerifiableCredentialFactory creates a verifiable credentials
 // handler.
-func OIDCUserinfoVerifiableCredentialFactory(config fosite.Configurator, storage, strategy any) any {
+func OIDCUserinfoVerifiableCredentialFactory(config fosite.Configurator, storage fosite.Storage, strategy any) any {
 	return &verifiable.Handler{
 		NonceManager: storage.(verifiable.NonceManager),
 		Config:       config,

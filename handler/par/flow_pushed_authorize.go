@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package par
@@ -23,7 +24,7 @@ var b64 = base64.URLEncoding.WithPadding(base64.NoPadding)
 
 // PushedAuthorizeHandler handles the PAR request
 type PushedAuthorizeHandler struct {
-	Storage interface{}
+	Storage fosite.PARStorageProvider
 	Config  fosite.Configurator
 }
 
@@ -34,11 +35,6 @@ func (c *PushedAuthorizeHandler) HandlePushedAuthorizeEndpointRequest(ctx contex
 	configProvider, ok := c.Config.(fosite.PushedAuthorizeRequestConfigProvider)
 	if !ok {
 		return errorsx.WithStack(fosite.ErrServerError.WithHint(fosite.ErrorPARNotSupported).WithDebug(fosite.DebugPARConfigMissing))
-	}
-
-	storage, ok := c.Storage.(fosite.PARStorage)
-	if !ok {
-		return errorsx.WithStack(fosite.ErrServerError.WithHint(fosite.ErrorPARNotSupported).WithDebug(fosite.DebugPARStorageInvalid))
 	}
 
 	if !ar.GetResponseTypes().HasOneOf("token", "code", "id_token") {
@@ -74,7 +70,7 @@ func (c *PushedAuthorizeHandler) HandlePushedAuthorizeEndpointRequest(ctx contex
 	requestURI := fmt.Sprintf("%s%s", configProvider.GetPushedAuthorizeRequestURIPrefix(ctx), b64.EncodeToString(stateKey))
 
 	// store
-	if err = storage.CreatePARSession(ctx, requestURI, ar); err != nil {
+	if err = c.Storage.PARStorage().CreatePARSession(ctx, requestURI, ar); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithHint("Unable to store the PAR session").WithWrap(err).WithDebug(err.Error()))
 	}
 

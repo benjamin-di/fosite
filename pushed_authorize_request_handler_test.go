@@ -28,8 +28,9 @@ import (
 func TestNewPushedAuthorizeRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	config := &Config{
 		ScopeStrategy:            ExactScopeStrategy,
@@ -89,7 +90,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 			},
 			expectedError: ErrInvalidRequest,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 		},
@@ -104,7 +106,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 			},
 			expectedError: ErrInvalidRequest,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 		},
@@ -119,7 +122,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 			},
 			expectedError: ErrInvalidRequest,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"invalid"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 		},
@@ -135,7 +139,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 			},
 			expectedError: ErrInvalidState,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 		},
@@ -152,7 +157,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 			},
 			expectedError: ErrInvalidState,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 		},
@@ -169,7 +175,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"scope":         {"foo bar baz"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 			expectedError: ErrInvalidScope,
@@ -188,12 +195,12 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
-					RedirectURIs:  []string{"https://foo.bar/cb"},
-					Scopes:        []string{"foo", "bar"},
-					Audience:      []string{"https://cloud.ory.sh/api"},
-					Secret:        []byte("1234"),
+					RedirectURIs:  []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"},
+					Audience: []string{"https://cloud.ory.sh/api"},
+					Secret:   []byte("1234"),
 				}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
@@ -227,7 +234,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
@@ -266,7 +274,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
@@ -305,7 +314,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"test value", ""},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
@@ -344,7 +354,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"web+application://callback"},
 					Scopes:        []string{"foo", "bar"},
@@ -383,7 +394,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api  https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
@@ -422,7 +434,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_mode": {"unknown"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 			expectedError: ErrUnsupportedResponseMode,
@@ -441,7 +454,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_mode": {"form_post"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 			expectedError: ErrUnsupportedResponseMode,
@@ -460,7 +474,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_mode": {"form_post"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
 					DefaultClient: &DefaultClient{
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
@@ -488,7 +503,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
 					DefaultClient: &DefaultClient{
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
@@ -534,7 +550,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
 					DefaultClient: &DefaultClient{
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
@@ -580,7 +597,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultResponseModeClient{
 					DefaultClient: &DefaultClient{
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
@@ -627,7 +645,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_mode": {"form_post"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).Times(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
 			},
 			expectedError: ErrInvalidRequest.WithHint("The request must not contain 'request_uri'."),
@@ -647,7 +666,8 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_mode": {"form_post"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
+				store.EXPECT().ClientManager().Return(clientManager).MaxTimes(2)
+				clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{RedirectURIs: []string{"https://foo.bar/cb"}, Scopes: []string{"foo", "bar"}, ResponseTypes: []string{"code token"}, Secret: []byte("1234")}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("4321"))).Return(fmt.Errorf("invalid hash"))
 			},
 			expectedError: ErrInvalidClient,
@@ -684,6 +704,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 func TestNewPushedAuthorizeRequestUsesRedirectURIMatcher(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
 	defer ctrl.Finish()
 
@@ -717,7 +738,8 @@ func TestNewPushedAuthorizeRequestUsesRedirectURIMatcher(t *testing.T) {
 		URL:    &url.URL{RawQuery: query.Encode()},
 	}
 
-	store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+	store.EXPECT().ClientManager().Return(clientManager).MaxTimes(2)
+	clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 		RedirectURIs:  []string{"https://*.example.com/callback"},
 		ResponseTypes: []string{"code"},
 		Secret:        []byte("1234"),
@@ -733,6 +755,7 @@ func TestNewPushedAuthorizeRequestUsesRedirectURIMatcher(t *testing.T) {
 func TestNewPushedAuthorizeRequestIgnoresUnknownScopes(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
 	defer ctrl.Finish()
 
@@ -762,7 +785,8 @@ func TestNewPushedAuthorizeRequestIgnoresUnknownScopes(t *testing.T) {
 		URL:    &url.URL{RawQuery: query.Encode()},
 	}
 
-	store.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
+	store.EXPECT().ClientManager().Return(clientManager).MaxTimes(2)
+	clientManager.EXPECT().GetClient(gomock.Any(), "1234").Return(&DefaultClient{
 		RedirectURIs:  []string{"https://foo.bar/cb"},
 		ResponseTypes: []string{"code"},
 		Scopes:        []string{"openid", "profile", "email"},

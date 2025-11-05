@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package integration_test
@@ -8,13 +9,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	goauth "golang.org/x/oauth2"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/internal/gen"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	goauth "golang.org/x/oauth2"
 )
 
 func TestDeviceFlow(t *testing.T) {

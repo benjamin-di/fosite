@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -22,9 +23,10 @@ import (
 func TestNewRevocationRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	handler := internal.NewMockRevocationHandler(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	client := &DefaultClient{}
 	config := &Config{ClientSecretsHasher: hasher}
@@ -69,7 +71,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
 			},
 		},
 		{
@@ -82,7 +85,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(errors.New(""))
@@ -98,7 +102,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -117,7 +122,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -136,7 +142,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = true
 				handler.EXPECT().RevokeToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 			},
@@ -153,7 +160,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -172,7 +180,8 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -206,7 +215,7 @@ func TestWriteRevocationResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	config := &Config{ClientSecretsHasher: hasher}
 	fosite := &Fosite{Store: store, Config: config}

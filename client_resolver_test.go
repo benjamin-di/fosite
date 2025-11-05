@@ -23,11 +23,17 @@ type stubCIMDFetcher struct {
 	calls       int
 }
 
-type resolverTestStore struct {
-	Storage
+type resolverTestStore struct{}
+
+func (*resolverTestStore) ClientManager() ClientManager {
+	return resolverTestClientManager{}
 }
 
-func (*resolverTestStore) GetClient(context.Context, string) (Client, error) {
+type resolverTestClientManager struct {
+	ClientManager
+}
+
+func (resolverTestClientManager) GetClient(context.Context, string) (Client, error) {
 	return nil, ErrNotFound
 }
 

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -10,15 +11,26 @@ import (
 )
 
 type CoreStrategy interface {
-	AccessTokenStrategy
-	RefreshTokenStrategy
-	AuthorizeCodeStrategy
+	AuthorizeCodeStrategyProvider
+	AccessTokenStrategyProvider
+	RefreshTokenStrategyProvider
 }
 
+type AuthorizeCodeStrategy interface {
+	AuthorizeCodeSignature(ctx context.Context, token string) string
+	GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
+	ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error)
+}
+type AuthorizeCodeStrategyProvider interface {
+	AuthorizeCodeStrategy() AuthorizeCodeStrategy
+}
 type AccessTokenStrategy interface {
 	AccessTokenSignature(ctx context.Context, token string) string
 	GenerateAccessToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
 	ValidateAccessToken(ctx context.Context, requester fosite.Requester, token string) (err error)
+}
+type AccessTokenStrategyProvider interface {
+	AccessTokenStrategy() AccessTokenStrategy
 }
 
 type RefreshTokenStrategy interface {
@@ -26,9 +38,6 @@ type RefreshTokenStrategy interface {
 	GenerateRefreshToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
 	ValidateRefreshToken(ctx context.Context, requester fosite.Requester, token string) (err error)
 }
-
-type AuthorizeCodeStrategy interface {
-	AuthorizeCodeSignature(ctx context.Context, token string) string
-	GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
-	ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error)
+type RefreshTokenStrategyProvider interface {
+	RefreshTokenStrategy() RefreshTokenStrategy
 }

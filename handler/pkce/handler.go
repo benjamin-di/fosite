@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package pkce
@@ -9,20 +10,19 @@ import (
 	"encoding/base64"
 	"regexp"
 
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/x/errorsx"
 
 	"github.com/pkg/errors"
-
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
 )
 
 var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
 type Handler struct {
-	AuthorizeCodeStrategy oauth2.AuthorizeCodeStrategy
-	Storage               PKCERequestStorage
-	Config                interface {
+	Strategy oauth2.AuthorizeCodeStrategyProvider
+	Storage  PKCERequestStorageProvider
+	Config   interface {
 		fosite.EnforcePKCEProvider
 		fosite.EnforcePKCEForPublicClientsProvider
 		fosite.EnablePKCEPlainChallengeMethodProvider
@@ -57,8 +57,8 @@ func (c *Handler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.
 		return errorsx.WithStack(fosite.ErrServerError.WithDebug("The PKCE handler must be loaded after the authorize code handler."))
 	}
 
-	signature := c.AuthorizeCodeStrategy.AuthorizeCodeSignature(ctx, code)
-	if err := c.Storage.CreatePKCERequestSession(ctx, signature, ar.Sanitize([]string{
+	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
+	if err := c.Storage.PKCERequestStorage().CreatePKCERequestSession(ctx, signature, ar.Sanitize([]string{
 		"code_challenge",
 		"code_challenge_method",
 	})); err != nil {
@@ -131,8 +131,8 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 	verifier := request.GetRequestForm().Get("code_verifier")
 
 	code := request.GetRequestForm().Get("code")
-	signature := c.AuthorizeCodeStrategy.AuthorizeCodeSignature(ctx, code)
-	pkceRequest, err := c.Storage.GetPKCERequestSession(ctx, signature, request.GetSession())
+	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
+	pkceRequest, err := c.Storage.PKCERequestStorage().GetPKCERequestSession(ctx, signature, request.GetSession())
 
 	nv := len(verifier)
 
@@ -146,7 +146,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err := c.Storage.DeletePKCERequestSession(ctx, signature); err != nil {
+	if err := c.Storage.PKCERequestStorage().DeletePKCERequestSession(ctx, signature); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 

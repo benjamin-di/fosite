@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package verifiable
@@ -35,7 +36,7 @@ func TestHandler(t *testing.T) {
 		t.Parallel()
 		handler := newHandler(t)
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
+		t.Cleanup(ctrl.Finish)
 
 		req := internal.NewMockAccessRequester(ctrl)
 		req.EXPECT().GetGrantedScopes().Return(fosite.Arguments{"openid", draftScope}).AnyTimes()
@@ -53,7 +54,7 @@ func TestHandler(t *testing.T) {
 		t.Parallel()
 		handler := newHandler(t)
 		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
+		t.Cleanup(ctrl.Finish)
 
 		req := internal.NewMockAccessRequester(ctrl)
 		req.EXPECT().GetGrantedScopes().Return(fosite.Arguments{"openid"}).AnyTimes()

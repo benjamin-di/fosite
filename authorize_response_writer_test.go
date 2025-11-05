@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -20,7 +21,7 @@ func TestNewAuthorizeResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	handlers := []*MockAuthorizeEndpointHandler{NewMockAuthorizeEndpointHandler(ctrl)}
 	ar := NewMockAuthorizeRequester(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	ctx := context.Background()
 	oauth2 := &Fosite{Config: &Config{AuthorizeEndpointHandlers: AuthorizeEndpointHandlers{handlers[0]}}}

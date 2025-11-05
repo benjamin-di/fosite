@@ -18,8 +18,9 @@ import (
 	reflect "reflect"
 	time "time"
 
-	fosite "github.com/ory/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/fosite"
 )
 
 // MockAuthorizeRequester is a mock of AuthorizeRequester interface.

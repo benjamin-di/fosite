@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -17,7 +18,7 @@ type HandleHelperConfigProvider interface {
 
 type HandleHelper struct {
 	AccessTokenStrategy AccessTokenStrategy
-	AccessTokenStorage  AccessTokenStorage
+	Storage             AccessTokenStorageProvider
 	Config              HandleHelperConfigProvider
 }
 
@@ -25,7 +26,7 @@ func (h *HandleHelper) IssueAccessToken(ctx context.Context, defaultLifespan tim
 	token, signature, err := h.AccessTokenStrategy.GenerateAccessToken(ctx, requester)
 	if err != nil {
 		return "", err
-	} else if err := h.AccessTokenStorage.CreateAccessTokenSession(ctx, signature, requester.Sanitize([]string{})); err != nil {
+	} else if err := h.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, signature, requester.Sanitize([]string{})); err != nil {
 		return "", err
 	}
 

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -25,7 +26,7 @@ import (
 func TestIntrospectionResponseTokenUse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	validator := internal.NewMockTokenIntrospector(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	ctx := gomock.AssignableToTypeOf(context.WithValue(context.TODO(), ContextKey("test"), nil))
 
@@ -76,6 +77,7 @@ func TestIntrospectionResponseTokenUse(t *testing.T) {
 		})
 	}
 }
+
 func TestIntrospectionResponse(t *testing.T) {
 	r := &fosite.IntrospectionResponse{
 		AccessRequester: fosite.NewAccessRequest(nil),
@@ -89,7 +91,7 @@ func TestIntrospectionResponse(t *testing.T) {
 func TestNewIntrospectionRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	validator := internal.NewMockTokenIntrospector(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	ctx := gomock.AssignableToTypeOf(context.WithValue(context.TODO(), ContextKey("test"), nil))
 
@@ -158,7 +160,7 @@ func TestNewIntrospectionRequest(t *testing.T) {
 				httpreq = &http.Request{
 					Method: "POST",
 					Header: http.Header{
-						//Basic Authorization with username=encoded:client and password=encoded&password
+						// Basic Authorization with username=encoded:client and password=encoded&password
 						"Authorization": []string{"Basic ZW5jb2RlZCUzQWNsaWVudDplbmNvZGVkJTI2cGFzc3dvcmQ="},
 					},
 					PostForm: url.Values{
@@ -176,7 +178,7 @@ func TestNewIntrospectionRequest(t *testing.T) {
 				httpreq = &http.Request{
 					Method: "POST",
 					Header: http.Header{
-						//Basic Authorization with username=my-client and password=foobar
+						// Basic Authorization with username=my-client and password=foobar
 						"Authorization": []string{"Basic bXktY2xpZW50OmZvb2Jhcg=="},
 					},
 					PostForm: url.Values{
@@ -194,7 +196,7 @@ func TestNewIntrospectionRequest(t *testing.T) {
 				httpreq = &http.Request{
 					Method: "POST",
 					Header: http.Header{
-						//Basic Authorization with username=my-client and password=foobaz
+						// Basic Authorization with username=my-client and password=foobaz
 						"Authorization": []string{"Basic bXktY2xpZW50OmZvb2Jheg=="},
 					},
 					PostForm: url.Values{

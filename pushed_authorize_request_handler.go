@@ -9,10 +9,11 @@ import (
 	"errors"
 	"net/http"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/fosite/i18n"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-	"go.opentelemetry.io/otel/trace"
 )
 
 const (

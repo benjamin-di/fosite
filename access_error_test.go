@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -24,7 +25,7 @@ func TestWriteAccessError(t *testing.T) {
 	header := http.Header{}
 	ctrl := gomock.NewController(t)
 	rw := NewMockResponseWriter(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	rw.EXPECT().Header().AnyTimes().Return(header)
 	rw.EXPECT().WriteHeader(http.StatusBadRequest)

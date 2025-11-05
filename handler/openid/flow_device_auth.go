@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package openid
@@ -6,20 +7,17 @@ package openid
 import (
 	"context"
 
-	"github.com/ory/fosite/handler/rfc8628"
-
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/handler/rfc8628"
 )
 
 // OpenIDConnectDeviceHandler a response handler for the Device Authorization Grant with OpenID Connect identity layer
 type OpenIDConnectDeviceHandler struct {
-	OpenIDConnectRequestStorage OpenIDConnectRequestStorage
-	DeviceCodeStrategy          rfc8628.DeviceCodeStrategy
-
-	Config interface {
+	Storage  OpenIDConnectRequestStorageProvider
+	Strategy rfc8628.DeviceCodeStrategyProvider
+	Config   interface {
 		fosite.IDTokenLifespanProvider
 	}
-
 	*IDTokenHandleHelper
 }
 

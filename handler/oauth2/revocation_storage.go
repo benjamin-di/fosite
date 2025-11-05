@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -10,9 +11,6 @@ import (
 // TokenRevocationStorage provides the storage implementation
 // as specified in: https://tools.ietf.org/html/rfc7009
 type TokenRevocationStorage interface {
-	RefreshTokenStorage
-	AccessTokenStorage
-
 	// RevokeRefreshToken revokes a refresh token as specified in:
 	// https://tools.ietf.org/html/rfc7009#section-2.1
 	// If the particular
@@ -28,4 +26,8 @@ type TokenRevocationStorage interface {
 	// is an access token, the server MAY revoke the respective refresh
 	// token as well.
 	RevokeAccessToken(ctx context.Context, requestID string) error
+}
+
+type TokenRevocationStorageProvider interface {
+	TokenRevocationStorage() TokenRevocationStorage
 }

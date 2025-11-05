@@ -9,10 +9,12 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/internal/gen"
 	"github.com/ory/fosite/token/jwt"
 )
 
@@ -109,18 +111,50 @@ func newRFC9068JWTStrategyTestCase() (*RFC9068JWTStrategy, *fosite.Request, *fos
 		DefaultJWTStrategy: &DefaultJWTStrategy{
 			Signer: &jwt.DefaultSigner{
 				GetPrivateKey: func(context.Context) (interface{}, error) {
-					return rsaKey, nil
+					return rfc9068TestKey, nil
 				},
 			},
-			HMACSHAStrategy: hmacshaStrategy,
-			Config:          config,
+			Config: config,
 		},
 	}
-	request := jwtValidCase(fosite.AccessToken)
+	request := newRFC9068TestRequest()
 	request.Client.(*fosite.DefaultClient).ID = "client-id"
 	request.Session.(*JWTSession).JWTClaims.Issuer = ""
 
 	return strategy, request, config
+}
+
+var rfc9068TestKey = gen.MustRSAKey()
+
+// newRFC9068TestRequest returns a valid access token request whose session
+// carries the claims RFC 9068 requires.
+func newRFC9068TestRequest() *fosite.Request {
+	r := &fosite.Request{
+		Client: &fosite.DefaultClient{
+			Secret: []byte("foobarfoobarfoobarfoobar"),
+		},
+		Session: &JWTSession{
+			JWTClaims: &jwt.JWTClaims{
+				Issuer:    "fosite",
+				Subject:   "peter",
+				IssuedAt:  time.Now().UTC(),
+				NotBefore: time.Now().UTC(),
+				Extra:     map[string]interface{}{"foo": "bar"},
+			},
+			JWTHeader: &jwt.Headers{
+				Extra: make(map[string]interface{}),
+			},
+			ExpiresAt: map[fosite.TokenType]time.Time{
+				fosite.AccessToken: time.Now().UTC().Add(time.Hour),
+			},
+		},
+	}
+	r.SetRequestedScopes([]string{"email", "offline"})
+	r.GrantScope("email")
+	r.GrantScope("offline")
+	r.SetRequestedAudience([]string{"group0"})
+	r.GrantAudience("group0")
+	return r
 }
 
 func decodeRFC9068JWTPart(t *testing.T, token string, part int) map[string]interface{} {

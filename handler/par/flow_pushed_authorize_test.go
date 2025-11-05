@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package par_test
@@ -16,7 +17,7 @@ import (
 	"github.com/ory/fosite/storage"
 
 	"github.com/ory/fosite"
-	. "github.com/ory/fosite/handler/par"
+	"github.com/ory/fosite/handler/par"
 )
 
 func parseURL(uu string) *url.URL {
@@ -27,7 +28,7 @@ func parseURL(uu string) *url.URL {
 func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 	requestURIPrefix := "urn:ietf:params:oauth:request_uri_diff:"
 	store := storage.NewMemoryStore()
-	handler := PushedAuthorizeHandler{
+	handler := par.PushedAuthorizeHandler{
 		Storage: store,
 		Config: &fosite.Config{
 			PushedAuthorizeContextLifespan:  30 * time.Minute,
@@ -37,7 +38,7 @@ func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 		},
 	}
 	for _, c := range []struct {
-		handler     PushedAuthorizeHandler
+		handler     par.PushedAuthorizeHandler
 		areq        *fosite.AuthorizeRequest
 		description string
 		expectErr   error

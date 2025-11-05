@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package openid
@@ -24,4 +25,7 @@ type OpenIDConnectRequestStorage interface {
 
 	// DeleteOpenIDConnectSession removes an open id connect session from the store.
 	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
+}
+type OpenIDConnectRequestStorageProvider interface {
+	OpenIDConnectRequestStorage() OpenIDConnectRequestStorage
 }
