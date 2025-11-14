@@ -16,8 +16,9 @@ package internal
 import (
 	reflect "reflect"
 
-	fosite "github.com/ory/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/fosite"
 )
 
 // MockStorage is a mock of Storage interface.
