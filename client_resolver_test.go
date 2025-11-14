@@ -25,7 +25,7 @@ type stubCIMDFetcher struct {
 
 type resolverTestStore struct{}
 
-func (*resolverTestStore) ClientManager() ClientManager {
+func (*resolverTestStore) FositeClientManager() ClientManager {
 	return resolverTestClientManager{}
 }
 

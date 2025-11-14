@@ -39,7 +39,7 @@ func (f ClientResolverFunc) ResolveClient(ctx context.Context, clientID string, 
 func (f *Fosite) resolveClient(ctx context.Context, clientID string) (Client, error) {
 	// The store is only consulted when the resolver delegates to it.
 	next := ClientLookupFunc(func(ctx context.Context, clientID string) (Client, error) {
-		return f.Store.ClientManager().GetClient(ctx, clientID)
+		return f.Store.FositeClientManager().GetClient(ctx, clientID)
 	})
 	if provider, ok := f.Config.(ClientResolverProvider); ok {
 		if resolver := provider.GetClientResolver(ctx); resolver != nil {

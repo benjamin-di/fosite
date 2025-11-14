@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package verifiable
@@ -21,7 +22,7 @@ type Handler struct {
 	Config interface {
 		fosite.VerifiableCredentialsNonceLifespanProvider
 	}
-	NonceManager
+	NonceManagerProvider
 }
 
 var _ fosite.TokenEndpointHandler = (*Handler)(nil)
@@ -45,7 +46,7 @@ func (c *Handler) PopulateTokenEndpointResponse(
 
 	lifespan := c.Config.GetVerifiableCredentialsNonceLifespan(ctx)
 	expiry := time.Now().UTC().Add(lifespan)
-	nonce, err := c.NewNonce(ctx, response.GetAccessToken(), expiry)
+	nonce, err := c.NonceManager().NewNonce(ctx, response.GetAccessToken(), expiry)
 	if err != nil {
 		return err
 	}

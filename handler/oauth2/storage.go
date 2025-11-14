@@ -10,12 +10,6 @@ import (
 	"github.com/ory/fosite"
 )
 
-type CoreStorage interface {
-	AuthorizeCodeStorageProvider
-	AccessTokenStorageProvider
-	RefreshTokenStorageProvider
-}
-
 // AuthorizeCodeStorage handles storage requests related to authorization codes.
 type AuthorizeCodeStorage interface {
 	// CreateAuthorizeCodeSession stores the authorization request for a given authorization code.

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package verifiable
@@ -14,4 +15,8 @@ type NonceManager interface {
 
 	// IsNonceValid checks if the given nonce is valid for the given access token and not expired.
 	IsNonceValid(ctx context.Context, accessToken string, nonce string) error
+}
+
+type NonceManagerProvider interface {
+	NonceManager() NonceManager
 }

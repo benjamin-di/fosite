@@ -71,7 +71,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
 			},
 		},
@@ -85,7 +85,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
@@ -102,7 +102,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
@@ -122,7 +122,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
@@ -142,7 +142,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = true
 				handler.EXPECT().RevokeToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
@@ -160,7 +160,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false
@@ -180,7 +180,7 @@ func TestNewRevocationRequest(t *testing.T) {
 			},
 			expectErr: nil,
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Secret = []byte("foo")
 				client.Public = false

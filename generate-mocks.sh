@@ -39,6 +39,7 @@ mockgen -package internal -destination internal/refresh_token_strategy.go github
 mockgen -package internal -destination internal/refresh_token_strategy_provider.go github.com/ory/fosite/handler/oauth2 RefreshTokenStrategyProvider
 mockgen -package internal -destination internal/request.go github.com/ory/fosite Requester
 mockgen -package internal -destination internal/resource_owner_password_credentials_grant_storage.go github.com/ory/fosite/handler/oauth2 ResourceOwnerPasswordCredentialsGrantStorage
+mockgen -package internal -destination internal/resource_owner_password_credentials_grant_storage_provider.go github.com/ory/fosite/handler/oauth2 ResourceOwnerPasswordCredentialsGrantStorageProvider
 mockgen -package internal -destination internal/revocation_handler.go github.com/ory/fosite RevocationHandler
 mockgen -package internal -destination internal/revocation_handlers_provider.go github.com/ory/fosite RevocationHandlersProvider
 mockgen -package internal -destination internal/rfc7523_key_storage.go github.com/ory/fosite/handler/rfc7523 RFC7523KeyStorage

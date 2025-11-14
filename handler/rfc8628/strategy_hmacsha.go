@@ -33,8 +33,6 @@ type DefaultDeviceStrategy struct {
 	}
 }
 
-var _ RFC8628CodeStrategy = (*DefaultDeviceStrategy)(nil)
-
 const deviceCodePrefix = "pocket_id_dc_"
 
 // GenerateUserCode generates a user_code
