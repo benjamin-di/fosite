@@ -18,7 +18,7 @@ test:  # runs all tests
 	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
 .bin/licenses: Makefile
-	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 .bin/mockgen:
 	go build -o .bin/mockgen go.uber.org/mock/mockgen
