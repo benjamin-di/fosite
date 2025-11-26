@@ -6,7 +6,6 @@ require (
 	github.com/dgraph-io/ristretto/v2 v2.4.0
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/magiconair/properties v1.8.10
 	github.com/mattn/goveralls v0.0.12
