@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package integration_test
@@ -20,14 +21,14 @@ import (
 )
 
 func TestResourceOwnerPasswordCredentialsFlow(t *testing.T) {
-	for _, strategy := range []hst.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []hst.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runResourceOwnerPasswordCredentialsGrantTest(t, strategy)
 	}
 }
 
-func runResourceOwnerPasswordCredentialsGrantTest(t *testing.T, strategy hst.AccessTokenStrategy) {
+func runResourceOwnerPasswordCredentialsGrantTest(t *testing.T, strategy hst.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2ResourceOwnerPasswordCredentialsFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()

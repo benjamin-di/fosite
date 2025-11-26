@@ -11,17 +11,15 @@ import (
 	"testing"
 	"time"
 
-	gomock "go.uber.org/mock/gomock"
-
 	"github.com/pkg/errors"
-
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/internal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/storage"
 )
 
@@ -34,7 +32,7 @@ func TestRefreshFlow_HandleTokenEndpointRequest(t *testing.T) {
 		},
 	}
 
-	for k, strategy := range map[string]oauth2.RefreshTokenStrategy{
+	for k, strategy := range map[string]oauth2.CoreStrategy{
 		"hmac": hmacshaStrategy,
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
@@ -326,12 +324,9 @@ func TestRefreshFlow_HandleTokenEndpointRequest(t *testing.T) {
 						RefreshTokenScopes:       []string{"offline"},
 					}
 					handler = &oauth2.RefreshTokenGrantHandler{
-						Storage: store,
-						Strategy: strategy.(interface {
-							oauth2.AccessTokenStrategyProvider
-							oauth2.RefreshTokenStrategyProvider
-						}),
-						Config: config,
+						Storage:  store,
+						Strategy: &compose.CommonStrategyProvider{CoreStrategy: strategy},
+						Config:   config,
 					}
 
 					areq = fosite.NewAccessRequest(&fosite.DefaultSession{})
@@ -453,7 +448,7 @@ func TestRefreshFlowTransactional_HandleTokenEndpointRequest(t *testing.T) {
 
 			handler := oauth2.RefreshTokenGrantHandler{
 				Storage:  mockStorage,
-				Strategy: hmacshaStrategy,
+				Strategy: &compose.CommonStrategyProvider{CoreStrategy: hmacshaStrategy},
 				Config: &fosite.Config{
 					AccessTokenLifespan:      time.Hour,
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,
@@ -501,21 +496,21 @@ func TestRefreshFlow_PopulateTokenEndpointResponse(t *testing.T) {
 						areq.RequestedScope = fosite.Arguments{"foo", "bar"}
 						areq.GrantedScope = fosite.Arguments{"foo", "bar"}
 
-						token, signature, err := strategy.RefreshTokenStrategy().GenerateRefreshToken(context.Background(), nil)
+						token, signature, err := strategy.GenerateRefreshToken(context.Background(), nil)
 						require.NoError(t, err)
 						require.NoError(t, store.CreateRefreshTokenSession(context.Background(), signature, "", areq))
 						areq.Form.Add("refresh_token", token)
 					},
 					check: func(t *testing.T) {
-						signature := strategy.RefreshTokenStrategy().RefreshTokenSignature(context.Background(), areq.Form.Get("refresh_token"))
+						signature := strategy.RefreshTokenSignature(context.Background(), areq.Form.Get("refresh_token"))
 
 						// The old refresh token should be deleted
 						_, err := store.GetRefreshTokenSession(context.Background(), signature, nil)
 						require.Error(t, err)
 
 						assert.Equal(t, "req-id", areq.ID)
-						require.NoError(t, strategy.AccessTokenStrategy().ValidateAccessToken(context.Background(), areq, aresp.GetAccessToken()))
-						require.NoError(t, strategy.RefreshTokenStrategy().ValidateRefreshToken(context.Background(), areq, aresp.ToMap()["refresh_token"].(string)))
+						require.NoError(t, strategy.ValidateAccessToken(context.Background(), areq, aresp.GetAccessToken()))
+						require.NoError(t, strategy.ValidateRefreshToken(context.Background(), areq, aresp.ToMap()["refresh_token"].(string)))
 						assert.Equal(t, "bearer", aresp.GetTokenType())
 						assert.NotEmpty(t, aresp.ToMap()["expires_in"])
 						assert.Equal(t, "foo bar", aresp.ToMap()["scope"])
@@ -529,12 +524,9 @@ func TestRefreshFlow_PopulateTokenEndpointResponse(t *testing.T) {
 						AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
 					}
 					h := oauth2.RefreshTokenGrantHandler{
-						Storage: store,
-						Strategy: strategy.(interface {
-							oauth2.AccessTokenStrategyProvider
-							oauth2.RefreshTokenStrategyProvider
-						}),
-						Config: config,
+						Storage:  store,
+						Strategy: &compose.CommonStrategyProvider{CoreStrategy: strategy},
+						Config:   config,
 					}
 					areq = fosite.NewAccessRequest(&fosite.DefaultSession{})
 					aresp = fosite.NewAccessResponse()
@@ -1051,7 +1043,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 
 			handler := oauth2.RefreshTokenGrantHandler{
 				Storage:  mockStorage,
-				Strategy: hmacshaStrategy,
+				Strategy: &compose.CommonStrategyProvider{CoreStrategy: hmacshaStrategy},
 				Config: &fosite.Config{
 					AccessTokenLifespan:      time.Hour,
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,

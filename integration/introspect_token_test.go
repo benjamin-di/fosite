@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package integration_test
@@ -21,31 +22,33 @@ import (
 func TestIntrospectToken(t *testing.T) {
 	for _, c := range []struct {
 		description string
-		strategy    oauth2.AccessTokenStrategy
+		strategy    oauth2.CoreStrategyProvider
 		factory     compose.Factory
 	}{
 		{
 			description: "HMAC strategy with OAuth2TokenIntrospectionFactory",
-			strategy:    hmacStrategy,
+			strategy:    hmacStrategyProvider,
 			factory:     compose.OAuth2TokenIntrospectionFactory,
 		},
 		{
 			description: "JWT strategy with OAuth2TokenIntrospectionFactory",
-			strategy:    jwtStrategy,
+			strategy:    jwtStrategyProvider,
 			factory:     compose.OAuth2TokenIntrospectionFactory,
 		},
 		{
 			description: "JWT strategy with OAuth2StatelessJWTIntrospectionFactory",
-			strategy:    jwtStrategy,
+			strategy:    jwtStrategyProvider,
 			factory:     compose.OAuth2StatelessJWTIntrospectionFactory,
 		},
 	} {
-		t.Logf("testing %v", c.description)
-		runIntrospectTokenTest(t, c.strategy, c.factory)
+		t.Run(c.description, func(t *testing.T) {
+			t.Parallel()
+			runIntrospectTokenTest(t, c.strategy, c.factory)
+		})
 	}
 }
 
-func runIntrospectTokenTest(t *testing.T, strategy oauth2.AccessTokenStrategy, introspectionFactory compose.Factory) {
+func runIntrospectTokenTest(t *testing.T, strategy oauth2.CoreStrategyProvider, introspectionFactory compose.Factory) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2ClientCredentialsGrantFactory, introspectionFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()

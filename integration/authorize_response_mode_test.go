@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package integration_test
@@ -245,8 +246,7 @@ func TestAuthorizeResponseModes(t *testing.T) {
 			} else if fosite.ResponseModeType(c.responseMode) == fosite.ResponseModeFormPost {
 				// form_post
 				require.NoError(t, err)
-				code, state, iDToken, token, _, errResp, err = internal.ParseFormPostResponse(fositeStore.Clients["response-mode-client"].GetRedirectURIs()[0], resp.Body)
-				require.NoError(t, err)
+				code, state, iDToken, token, _, errResp = internal.ParseFormPostResponse(t, fositeStore.Clients["response-mode-client"].GetRedirectURIs()[0], resp.Body)
 			} else {
 				t.FailNow()
 			}

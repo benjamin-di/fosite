@@ -22,7 +22,7 @@ type RFC9068JWTStrategy struct {
 	*DefaultJWTStrategy
 }
 
-var _ CoreStrategy = (*RFC9068JWTStrategy)(nil)
+var _ AccessTokenStrategy = (*RFC9068JWTStrategy)(nil)
 
 func (h *RFC9068JWTStrategy) GenerateAccessToken(ctx context.Context, requester fosite.Requester) (string, string, error) {
 	// Derive the client identifier from the authenticated requester so custom session claims cannot spoof it

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -68,7 +69,7 @@ func AccessTokenJWTToRequest(token *jwt.Token) fosite.Requester {
 	}
 }
 
-func (v *StatelessJWTValidator) IntrospectToken(ctx context.Context, token string, tokenUse fosite.TokenUse, accessRequest fosite.AccessRequester, scopes []string) (fosite.TokenUse, error) {
+func (v *StatelessJWTValidator) IntrospectToken(ctx context.Context, token string, _ fosite.TokenUse, accessRequest fosite.AccessRequester, scopes []string) (fosite.TokenUse, error) {
 	t, err := validate(ctx, v.Signer, token)
 	if err != nil {
 		return "", err

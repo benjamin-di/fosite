@@ -9,22 +9,22 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/internal/gen"
-
 	"github.com/go-jose/go-jose/v4"
-	"github.com/gorilla/mux"
 	goauth "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/integration/clients"
+	"github.com/ory/fosite/internal"
+	"github.com/ory/fosite/internal/gen"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/fosite/token/jwt"
@@ -186,33 +186,24 @@ func newJWTBearerAppClient(ts *httptest.Server) *clients.JWTBearer {
 	return clients.NewJWTBearer(ts.URL + tokenRelativePath)
 }
 
-var hmacStrategy = oauth2.NewHMACSHAStrategy(
-	&hmac.HMACStrategy{
-		Config: &fosite.Config{
-			GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows"),
-		},
-	},
-	&fosite.Config{
-		AccessTokenLifespan:   accessTokenLifespan,
-		AuthorizeCodeLifespan: authCodeLifespan,
-	},
-)
-
 var (
+	defaultConfig = &fosite.Config{AccessTokenLifespan: accessTokenLifespan, AuthorizeCodeLifespan: authCodeLifespan}
 	defaultRSAKey = gen.MustRSAKey()
-	jwtStrategy   = &oauth2.DefaultJWTStrategy{
-		Signer: &jwt.DefaultSigner{
-			GetPrivateKey: func(ctx context.Context) (interface{}, error) {
-				return defaultRSAKey, nil
-			},
-		},
-		Config:   &fosite.Config{},
-		Strategy: hmacStrategy,
+	defaultSigner = &jwt.DefaultSigner{GetPrivateKey: func(ctx context.Context) (interface{}, error) { return defaultRSAKey, nil }}
+	hmacStrategy  = oauth2.NewHMACSHAStrategy(
+		&hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows")}},
+		defaultConfig,
+	)
+	hmacStrategyProvider = &compose.CommonStrategyProvider{CoreStrategy: hmacStrategy, Signer: defaultSigner}
+	jwtStrategy          = &oauth2.DefaultJWTStrategy{
+		Signer: defaultSigner,
+		Config: defaultConfig,
 	}
+	jwtStrategyProvider = &compose.CommonStrategyProvider{CoreStrategy: hmacStrategy, AccessTokenStrat: jwtStrategy, Signer: defaultSigner}
 )
 
 func mockServer(t *testing.T, f fosite.OAuth2Provider, session fosite.Session) *httptest.Server {
-	router := mux.NewRouter()
+	router := http.NewServeMux()
 	router.HandleFunc("/auth", authEndpointHandler(t, f, session))
 	router.HandleFunc(tokenRelativePath, tokenEndpointHandler(t, f))
 	router.HandleFunc("/callback", authCallbackHandler(t))
@@ -223,5 +214,6 @@ func mockServer(t *testing.T, f fosite.OAuth2Provider, session fosite.Session) *
 	router.HandleFunc(deviceAuthRelativePath, deviceAuthorizationEndpointHandler(t, f, session))
 
 	ts := httptest.NewServer(router)
+	t.Cleanup(ts.Close)
 	return ts
 }

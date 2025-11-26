@@ -15,41 +15,56 @@ import (
 	"github.com/ory/fosite/token/jwt"
 )
 
-type CommonStrategy struct {
+type CommonStrategyProvider struct {
 	CoreStrategy      oauth2.CoreStrategy
+	AccessTokenStrat  oauth2.AccessTokenStrategy
 	DeviceStrategy    *rfc8628.DefaultDeviceStrategy
 	OIDCTokenStrategy openid.OpenIDConnectTokenStrategy
 	jwt.Signer
 }
 
-// OAuth2 Strategy Providers
-func (s *CommonStrategy) AuthorizeCodeStrategy() oauth2.AuthorizeCodeStrategy {
-	return s.CoreStrategy.AuthorizeCodeStrategy()
+var _ oauth2.AuthorizeCodeStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) AuthorizeCodeStrategy() oauth2.AuthorizeCodeStrategy {
+	return s.CoreStrategy
 }
 
-func (s *CommonStrategy) AccessTokenStrategy() oauth2.AccessTokenStrategy {
-	return s.CoreStrategy.AccessTokenStrategy()
+var _ oauth2.AccessTokenStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) AccessTokenStrategy() oauth2.AccessTokenStrategy {
+	if s.AccessTokenStrat != nil {
+		return s.AccessTokenStrat
+	}
+	return s.CoreStrategy
 }
 
-func (s *CommonStrategy) RefreshTokenStrategy() oauth2.RefreshTokenStrategy {
-	return s.CoreStrategy.RefreshTokenStrategy()
+var _ oauth2.RefreshTokenStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) RefreshTokenStrategy() oauth2.RefreshTokenStrategy {
+	return s.CoreStrategy
 }
 
-// OpenID Connect Strategy Provider
-func (s *CommonStrategy) OpenIDConnectTokenStrategy() openid.OpenIDConnectTokenStrategy {
+var _ openid.OpenIDConnectTokenStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) OpenIDConnectTokenStrategy() openid.OpenIDConnectTokenStrategy {
 	return s.OIDCTokenStrategy
 }
 
-// RFC8628 Device Strategy Providers
-func (s *CommonStrategy) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
+var _ rfc8628.DeviceRateLimitStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
 	return s.DeviceStrategy
 }
 
-func (s *CommonStrategy) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
+var _ rfc8628.DeviceCodeStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
 	return s.DeviceStrategy
 }
 
-func (s *CommonStrategy) UserCodeStrategy() rfc8628.UserCodeStrategy {
+var _ rfc8628.UserCodeStrategyProvider = (*CommonStrategyProvider)(nil)
+
+func (s *CommonStrategyProvider) UserCodeStrategy() rfc8628.UserCodeStrategy {
 	return s.DeviceStrategy
 }
 
@@ -68,22 +83,18 @@ func NewOAuth2HMACStrategy(config HMACSHAStrategyConfigurator) *oauth2.HMACSHASt
 	return oauth2.NewHMACSHAStrategy(&hmac.HMACStrategy{Config: config}, config)
 }
 
-func NewOAuth2JWTStrategy(keyGetter func(context.Context) (interface{}, error), strategy interface{}, config fosite.Configurator) *oauth2.DefaultJWTStrategy {
+func NewOAuth2JWTStrategy(keyGetter func(context.Context) (interface{}, error), config fosite.Configurator) *oauth2.DefaultJWTStrategy {
 	return &oauth2.DefaultJWTStrategy{
 		Signer: &jwt.DefaultSigner{GetPrivateKey: keyGetter},
-		Strategy: strategy.(interface {
-			oauth2.AuthorizeCodeStrategyProvider
-			oauth2.AccessTokenStrategyProvider
-			oauth2.RefreshTokenStrategyProvider
-		}),
 		Config: config,
 	}
 }
 
-// NewOAuth2RFC9068JWTStrategy creates a JWT strategy that issues RFC 9068 access tokens while retaining opaque refresh tokens and authorization codes
-func NewOAuth2RFC9068JWTStrategy(keyGetter func(context.Context) (interface{}, error), strategy oauth2.CoreStrategy, config fosite.Configurator) *oauth2.RFC9068JWTStrategy {
+// NewOAuth2RFC9068JWTStrategy creates an access token strategy that issues RFC 9068 access tokens.
+// Set it as CommonStrategyProvider.AccessTokenStrat so refresh tokens and authorization codes remain opaque.
+func NewOAuth2RFC9068JWTStrategy(keyGetter func(context.Context) (interface{}, error), config fosite.Configurator) *oauth2.RFC9068JWTStrategy {
 	return &oauth2.RFC9068JWTStrategy{
-		DefaultJWTStrategy: NewOAuth2JWTStrategy(keyGetter, strategy, config),
+		DefaultJWTStrategy: NewOAuth2JWTStrategy(keyGetter, config),
 	}
 }
 
@@ -94,7 +105,6 @@ func NewOpenIDConnectStrategy(keyGetter func(context.Context) (interface{}, erro
 	}
 }
 
-// Create a new device strategy
 func NewDeviceStrategy(config fosite.Configurator) *rfc8628.DefaultDeviceStrategy {
 	return &rfc8628.DefaultDeviceStrategy{
 		Enigma: &hmac.HMACStrategy{Config: config},

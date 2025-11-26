@@ -22,9 +22,9 @@ func TestRFC9068JWTStrategyGeneratesCompliantAccessToken(t *testing.T) {
 	strategy, request, _ := newRFC9068JWTStrategyTestCase()
 	request.Session.(*JWTSession).JWTClaims.Extra["client_id"] = "spoofed-client"
 
-	token, signature, err := strategy.GenerateAccessToken(t.Context(), request)
+	token, tokenSignature, err := strategy.GenerateAccessToken(t.Context(), request)
 	require.NoError(t, err)
-	require.Equal(t, strategy.signature(token), signature)
+	require.Equal(t, strategy.AccessTokenSignature(t.Context(), token), tokenSignature)
 
 	header := decodeRFC9068JWTPart(t, token, 0)
 	claims := decodeRFC9068JWTPart(t, token, 1)

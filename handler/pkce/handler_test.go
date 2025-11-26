@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/pkce"
 	"github.com/ory/fosite/storage"
@@ -49,7 +50,7 @@ func TestPKCEHandleAuthorizeEndpointRequest(t *testing.T) {
 	var config fosite.Config
 	h := &pkce.Handler{
 		Storage:  storage.NewMemoryStore(),
-		Strategy: oauth2.NewHMACSHAStrategy(nil, nil),
+		Strategy: &compose.CommonStrategyProvider{CoreStrategy: oauth2.NewHMACSHAStrategy(nil, nil)},
 		Config:   &config,
 	}
 	w := fosite.NewAuthorizeResponse()

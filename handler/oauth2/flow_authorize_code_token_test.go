@@ -11,18 +11,15 @@ import (
 	"testing"
 	"time"
 
-	//"time"
-
-	gomock "go.uber.org/mock/gomock"
-
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/internal"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite" //"github.com/ory/fosite/internal"
+	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/storage"
 )
 
@@ -62,7 +59,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					description: "should fail because authcode not found",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, _, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, _, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Set("code", code)
 					},
@@ -100,7 +97,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 						},
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -130,7 +127,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
 						config.RefreshTokenScopes = []string{}
-						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -160,7 +157,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
 						config.RefreshTokenScopes = []string{}
-						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -189,7 +186,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 						},
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -214,7 +211,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					}
 					h = oauth2.AuthorizeExplicitGrantHandler{
 						Storage:  store,
-						Strategy: strategy,
+						Strategy: &compose.CommonStrategyProvider{CoreStrategy: strategy},
 						Config:   config,
 					}
 
@@ -249,7 +246,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 
 			h := oauth2.AuthorizeExplicitGrantHandler{
 				Storage:  store,
-				Strategy: hmacshaStrategy,
+				Strategy: &compose.CommonStrategyProvider{CoreStrategy: hmacshaStrategy},
 				Config: &fosite.Config{
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
@@ -294,7 +291,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because authcode could not be retrieved (1)",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, _, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						token, _, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 					},
@@ -330,7 +327,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because client mismatch",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 
@@ -356,7 +353,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because redirect uri was set during /authorize call, but not in /token call",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 
@@ -384,7 +381,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should pass",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 
 						areq.Form = url.Values{"code": {token}}
@@ -409,7 +406,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 						assert.Equal(t, time.Now().Add(time.Minute).UTC().Round(time.Second), areq.GetSession().GetExpiresAt(fosite.RefreshToken))
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 

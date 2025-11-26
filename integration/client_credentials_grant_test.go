@@ -27,8 +27,8 @@ import (
 )
 
 func TestClientCredentialsFlow(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runClientCredentialsGrantTest(t, strategy)
 	}
@@ -48,7 +48,7 @@ func introspect(t *testing.T, ts *httptest.Server, token string, p interface{}, 
 	require.NoError(t, json.Unmarshal(body, p))
 }
 
-func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.AccessTokenStrategy) {
+func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2ClientCredentialsGrantFactory, compose.OAuth2TokenIntrospectionFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()
