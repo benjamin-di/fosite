@@ -455,7 +455,6 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 	}
 	request.Form = url.Values{"code": {token}}
-	response := fosite.NewAccessResponse()
 	propagatedContext := context.Background()
 
 	for k, c := range []struct {
@@ -996,7 +995,7 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			)
 
 			// invoke function under test
-			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, response); c.expectError != nil {
+			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, fosite.NewAccessResponse()); c.expectError != nil {
 				assert.EqualError(t, err, c.expectError.Error())
 			}
 		})
