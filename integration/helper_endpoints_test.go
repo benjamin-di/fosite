@@ -117,11 +117,11 @@ func authCallbackHandler(t *testing.T) func(rw http.ResponseWriter, req *http.Re
 		}
 
 		if q.Get("code") != "" {
-			rw.Write([]byte("code: ok"))
+			_, _ = rw.Write([]byte("code: ok"))
 		}
 		if q.Get("error") != "" {
 			rw.WriteHeader(http.StatusNotAcceptable)
-			rw.Write([]byte("error: " + q.Get("error")))
+			_, _ = rw.Write([]byte("error: " + q.Get("error")))
 		}
 
 	}
@@ -129,7 +129,7 @@ func authCallbackHandler(t *testing.T) func(rw http.ResponseWriter, req *http.Re
 
 func tokenEndpointHandler(t *testing.T, provider fosite.OAuth2Provider) func(rw http.ResponseWriter, req *http.Request) {
 	return func(rw http.ResponseWriter, req *http.Request) {
-		req.ParseMultipartForm(1 << 20)
+		_ = req.ParseMultipartForm(1 << 20)
 		ctx := fosite.NewContext()
 
 		accessRequest, err := provider.NewAccessRequest(ctx, req, &oauth2.JWTSession{})

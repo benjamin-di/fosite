@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package integration_test
@@ -79,7 +80,7 @@ func TestOIDCImplicitFlowPublicClientPKCE(t *testing.T) {
 					return errors.New("Dont follow redirects")
 				},
 			}
-			resp, err := client.Get(authURL)
+			_, err := client.Get(authURL)
 			require.Error(t, err)
 
 			t.Logf("Response (%d): %s", k, callbackURL.String())
@@ -91,7 +92,7 @@ func TestOIDCImplicitFlowPublicClientPKCE(t *testing.T) {
 
 			assert.NotEmpty(t, fragment.Get("id_token"))
 
-			resp, err = http.PostForm(oauthClient.Endpoint.TokenURL, url.Values{
+			resp, err := http.PostForm(oauthClient.Endpoint.TokenURL, url.Values{
 				"code":          {code},
 				"grant_type":    {"authorization_code"},
 				"client_id":     {"public-client"},
@@ -99,7 +100,9 @@ func TestOIDCImplicitFlowPublicClientPKCE(t *testing.T) {
 				"code_verifier": {c.codeVerifier},
 			})
 			require.NoError(t, err)
-			defer resp.Body.Close()
+			defer func(Body io.ReadCloser) {
+				_ = Body.Close()
+			}(resp.Body)
 
 			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)

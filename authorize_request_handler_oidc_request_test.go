@@ -95,7 +95,8 @@ func TestAuthorizeRequestParametersFromOpenIDConnectRequest(t *testing.T) {
 	noneRequestObjectWithNumericClientID := mustGenerateNoneAssertion(t, jwt.MapClaims{"scope": "foo", "client_id": 12345})
 
 	var reqH http.HandlerFunc = func(rw http.ResponseWriter, r *http.Request) {
-		rw.Write([]byte(validRequestObject))
+		_, err := rw.Write([]byte(validRequestObject))
+		require.NoError(t, err)
 	}
 	reqTS := httptest.NewServer(reqH)
 	defer reqTS.Close()

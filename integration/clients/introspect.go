@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package clients
@@ -52,7 +53,7 @@ func (c *Introspect) IntrospectToken(
 		return nil, err
 	}
 
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(response.Body)
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {

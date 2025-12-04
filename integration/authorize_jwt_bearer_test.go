@@ -6,6 +6,7 @@ package integration_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -266,7 +267,8 @@ func (s *authorizeJWTBearerSuite) TestBadResponseForSecondRequestWithSameJTI() {
 		},
 	}
 
-	client.GetToken(ctx, config, nil)
+	_, err := client.GetToken(ctx, config, nil)
+	require.NoError(s.T(), err)
 	token2, err := client.GetToken(ctx, config, nil)
 
 	s.assertBadResponse(s.T(), token2, err)
@@ -286,7 +288,8 @@ func (s *authorizeJWTBearerSuite) TestSuccessResponseForSecondRequestWithSameJTI
 		},
 	}
 
-	client.GetToken(ctx, config, nil)
+	_, err := client.GetToken(ctx, config, nil)
+	require.NoError(s.T(), err)
 
 	time.Sleep(time.Second)
 	config.Expiry = jwt.NewNumericDate(time.Now().Add(time.Hour))
@@ -397,7 +400,8 @@ func (s *authorizeJWTBearerSuite) assertBadResponse(t *testing.T, token *clients
 	assert.Nil(t, token)
 	assert.NotNil(t, err)
 
-	retrieveError, ok := err.(*clients.RequestError)
+	var retrieveError *clients.RequestError
+	ok := errors.As(err, &retrieveError)
 	assert.True(t, ok)
 	assert.Equal(t, retrieveError.Response.StatusCode, http.StatusBadRequest)
 }

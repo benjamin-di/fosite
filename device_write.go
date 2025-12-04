@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -32,7 +33,7 @@ func (f *Fosite) WriteDeviceResponse(ctx context.Context, rw http.ResponseWriter
 	}
 
 	r, err := json.Marshal(deviceResponse)
-	rw.Write(r)
+	_, _ = rw.Write(r)
 	if err != nil {
 		http.Error(rw, ErrServerError.WithWrap(err).WithDebug(err.Error()).Error(), http.StatusInternalServerError)
 		return
