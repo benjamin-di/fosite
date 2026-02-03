@@ -18,9 +18,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	gomock "go.uber.org/mock/gomock"
-
 	fosite "github.com/ory/fosite"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockAuthorizeRequester is a mock of AuthorizeRequester interface.
@@ -213,6 +212,21 @@ func (mr *MockAuthorizeRequesterMockRecorder) GetRequestedScopes() *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestedScopes", reflect.TypeOf((*MockAuthorizeRequester)(nil).GetRequestedScopes))
 }
 
+// GetResource mocks base method.
+func (m *MockAuthorizeRequester) GetResource() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetResource")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetResource indicates an expected call of GetResource.
+func (mr *MockAuthorizeRequesterMockRecorder) GetResource() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResource", reflect.TypeOf((*MockAuthorizeRequester)(nil).GetResource))
+}
+
 // GetResponseMode mocks base method.
 func (m *MockAuthorizeRequester) GetResponseMode() fosite.ResponseModeType {
 	m.ctrl.T.Helper()
@@ -239,21 +253,6 @@ func (m *MockAuthorizeRequester) GetResponseTypes() fosite.Arguments {
 func (mr *MockAuthorizeRequesterMockRecorder) GetResponseTypes() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResponseTypes", reflect.TypeOf((*MockAuthorizeRequester)(nil).GetResponseTypes))
-}
-
-// GetResource mocks base method.
-func (m *MockAuthorizeRequester) GetResource() (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetResource")
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetResource indicates an expected call of GetResource.
-func (mr *MockAuthorizeRequesterMockRecorder) GetResource() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResource", reflect.TypeOf((*MockAuthorizeRequester)(nil).GetResource))
 }
 
 // GetSession mocks base method.

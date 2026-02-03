@@ -1,4 +1,4 @@
-// Copyright © 2025 Ory Corp
+// Copyright © 2026 Ory Corp
 // Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,9 +16,8 @@ package internal
 import (
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
-
 	rfc7523 "github.com/ory/fosite/handler/rfc7523"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockRFC7523KeyStorageProvider is a mock of RFC7523KeyStorageProvider interface.

@@ -1,4 +1,4 @@
-// Copyright © 2025 Ory Corp
+// Copyright © 2026 Ory Corp
 // Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,9 +17,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
-
 	fosite "github.com/ory/fosite"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockTokenIntrospector is a mock of TokenIntrospector interface.
@@ -47,10 +46,10 @@ func (m *MockTokenIntrospector) EXPECT() *MockTokenIntrospectorMockRecorder {
 }
 
 // IntrospectToken mocks base method.
-func (m *MockTokenIntrospector) IntrospectToken(ctx context.Context, token string, tokenUse fosite.TokenType, accessRequest fosite.AccessRequester, scopes []string) (fosite.TokenType, error) {
+func (m *MockTokenIntrospector) IntrospectToken(ctx context.Context, token string, tokenUse fosite.TokenUse, accessRequest fosite.AccessRequester, scopes []string) (fosite.TokenUse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IntrospectToken", ctx, token, tokenUse, accessRequest, scopes)
-	ret0, _ := ret[0].(fosite.TokenType)
+	ret0, _ := ret[0].(fosite.TokenUse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -12,12 +12,11 @@ import (
 	"testing"
 	"time"
 
-	gomock "go.uber.org/mock/gomock"
-
-	"github.com/ory/fosite/internal"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/rfc8628"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/token/hmac"
 
 	"github.com/stretchr/testify/assert"
@@ -665,12 +664,12 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 
 	testCases := []struct {
 		description string
-		setup       func()
+		setup       func(t *testing.T)
 		expectError error
 	}{
 		{
 			description: "transaction should be committed successfully if no errors occur",
-			setup: func() {
+			setup: func(t *testing.T) {
 				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
 				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
@@ -701,8 +700,8 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockDeviceAuthStorage.
 					EXPECT().
@@ -719,16 +718,11 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 		},
 		{
 			description: "transaction should be rolled back if `InvalidateDeviceCodeSession` returns an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
 				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
@@ -757,25 +751,20 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockDeviceAuthStorage.
 					EXPECT().
 					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
 			description: "transaction should be rolled back if `CreateAccessTokenSession` returns an error",
-			setup: func() {
+			setup: func(t *testing.T) {
 				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
 				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
@@ -805,8 +794,8 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
+					Transaction(propagatedContext, gomock.Any()).
+					DoAndReturn(func(ctx context.Context, f func(ctx context.Context) error) error { return f(ctx) }).
 					Times(1)
 				mockDeviceAuthStorage.
 					EXPECT().
@@ -818,17 +807,12 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
-					Times(1)
 			},
 			expectError: fosite.ErrServerError,
 		},
 		{
-			description: "should result in a server error if transaction cannot be created",
-			setup: func() {
+			description: "should result in a server error if there is a transaction error",
+			setup: func(t *testing.T) {
 				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
 				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(1)
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
@@ -857,118 +841,8 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
-					BeginTX(propagatedContext).
-					Return(nil, errors.New("Whoops, unable to create transaction!"))
-			},
-			expectError: fosite.ErrServerError,
-		},
-		{
-			description: "should result in a server error if transaction cannot be rolled back",
-			setup: func() {
-				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
-				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
-				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
-				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
-
-				mockDeviceCodeStrategy.
-					EXPECT().
-					DeviceCodeSignature(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), nil)
-				mockDeviceAuthStorage.
-					EXPECT().
-					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(authreq, nil).
-					Times(1)
-				mockDeviceCodeStrategy.
-					EXPECT().
-					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(nil)
-				mockAccessTokenStrategy.
-					EXPECT().
-					GenerateAccessToken(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), gomock.Any().String(), nil)
-				mockRefreshTokenStrategy.
-					EXPECT().
-					GenerateRefreshToken(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), gomock.Any().String(), nil)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockDeviceAuthStorage.
-					EXPECT().
-					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
-					Return(errors.New("Whoops, a nasty database error occurred!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(errors.New("Whoops, unable to rollback transaction!")).
-					Times(1)
-			},
-			expectError: fosite.ErrServerError,
-		},
-		{
-			description: "should result in a server error if transaction cannot be committed",
-			setup: func() {
-				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
-				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
-				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
-				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
-				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
-				mockRefreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
-
-				mockDeviceCodeStrategy.
-					EXPECT().
-					DeviceCodeSignature(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), nil)
-				mockDeviceAuthStorage.
-					EXPECT().
-					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(authreq, nil).
-					Times(1)
-				mockDeviceCodeStrategy.
-					EXPECT().
-					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(nil)
-				mockAccessTokenStrategy.
-					EXPECT().
-					GenerateAccessToken(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), gomock.Any().String(), nil)
-				mockRefreshTokenStrategy.
-					EXPECT().
-					GenerateRefreshToken(gomock.Any(), gomock.Any()).
-					Return(gomock.Any().String(), gomock.Any().String(), nil)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil).
-					Times(1)
-				mockDeviceAuthStorage.
-					EXPECT().
-					InvalidateDeviceCodeSession(propagatedContext, gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockAccessTokenStorage.
-					EXPECT().
-					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockRefreshTokenStorage.
-					EXPECT().
-					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(nil).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Commit(propagatedContext).
-					Return(errors.New("Whoops, unable to commit transaction!")).
-					Times(1)
-				mockTransactional.
-					EXPECT().
-					Rollback(propagatedContext).
-					Return(nil).
+					Transaction(propagatedContext, gomock.Any()).
+					Return(errors.New("Whoops, unable to create transaction!")).
 					Times(1)
 			},
 			expectError: fosite.ErrServerError,
@@ -1027,7 +901,7 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				MockRefreshTokenStrategyProvider:    mockRefreshTokenStrategyProvider,
 			}
 
-			testCase.setup()
+			testCase.setup(t)
 
 			h := rfc8628.DeviceCodeTokenEndpointHandler{
 				Strategy: mockStrategy,
@@ -1039,9 +913,8 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				},
 			}
 
-			if err = h.PopulateTokenEndpointResponse(propagatedContext, areq, aresp); testCase.expectError != nil {
-				assert.EqualError(t, err, testCase.expectError.Error())
-			}
+			err = h.PopulateTokenEndpointResponse(propagatedContext, areq, aresp)
+			assert.ErrorIs(t, err, testCase.expectError)
 		})
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright © 2025 Ory Corp
+// Copyright © 2026 Ory Corp
 // Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,9 +16,8 @@ package internal
 import (
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
-
 	oauth2 "github.com/ory/fosite/handler/oauth2"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockRefreshTokenStrategyProvider is a mock of RefreshTokenStrategyProvider interface.

@@ -89,3 +89,5 @@ require (
 )
 
 go 1.26
+
+tool go.uber.org/mock/mockgen

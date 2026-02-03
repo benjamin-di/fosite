@@ -20,14 +20,11 @@ test:  # runs all tests
 .bin/licenses: Makefile
 	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
-.bin/mockgen:
-	go build -o .bin/mockgen go.uber.org/mock/mockgen
-
 node_modules: package-lock.json
 	npm ci
 	touch node_modules
 
-gen: .bin/goimports .bin/mockgen  # generates mocks
-	./generate-mocks.sh
+gen:  # generates mocks
+	./scripts/generate-mocks.sh
 
 .DEFAULT_GOAL := help

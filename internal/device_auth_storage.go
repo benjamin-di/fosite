@@ -1,4 +1,4 @@
-// Copyright © 2025 Ory Corp
+// Copyright © 2026 Ory Corp
 // Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,9 +17,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
-
 	fosite "github.com/ory/fosite"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockDeviceAuthStorage is a mock of DeviceAuthStorage interface.

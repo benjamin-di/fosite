@@ -18,9 +18,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	gomock "go.uber.org/mock/gomock"
-
 	fosite "github.com/ory/fosite"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockRequester is a mock of Requester interface.
