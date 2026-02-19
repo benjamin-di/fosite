@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -20,7 +21,6 @@ import (
 
 	"github.com/ory/fosite/i18n"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 )
@@ -80,7 +80,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 
 	assertion := request.Form.Get("request")
 	if location := request.Form.Get("request_uri"); len(location) > 0 {
-		if !stringslice.Has(oidcClient.GetRequestURIs(), location) {
+		if !slices.Contains(oidcClient.GetRequestURIs(), location) {
 			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Request URI '%s' is not whitelisted by the OAuth 2.0 Client.", location))
 		}
 
@@ -139,7 +139,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 			return nil, errorsx.WithStack(ErrInvalidRequestObject.WithHintf("The request object uses signing algorithm '%s', but the requested OAuth 2.0 Client enforces signing algorithm '%s'.", alg, oidcClient.GetRequestObjectSigningAlgorithm()))
 		}
 
-		if len(supportedAlgs) > 0 && !stringslice.Has(supportedAlgs, alg) {
+		if len(supportedAlgs) > 0 && !slices.Contains(supportedAlgs, alg) {
 			return nil, errorsx.WithStack(ErrInvalidRequestObject.WithHintf("The request object uses signing algorithm '%s', but the authorization server only supports %v.", alg, supportedAlgs))
 		}
 
@@ -287,12 +287,12 @@ func (f *Fosite) validateAuthorizePrompt(ctx context.Context, request *Authorize
 	}
 
 	for _, prompt := range requiredPrompt {
-		if !stringslice.Has(availablePrompts, prompt) {
+		if !slices.Contains(availablePrompts, prompt) {
 			return errorsx.WithStack(ErrInvalidRequest.WithHintf("Used unknown value '%s' for prompt parameter", requiredPrompt))
 		}
 	}
 
-	if stringslice.Has(requiredPrompt, "none") && len(requiredPrompt) > 1 {
+	if slices.Contains(requiredPrompt, "none") && len(requiredPrompt) > 1 {
 		return errorsx.WithStack(ErrInvalidRequest.WithHint("Parameter 'prompt' was set to 'none', but contains other values as well which is not allowed."))
 	}
 
