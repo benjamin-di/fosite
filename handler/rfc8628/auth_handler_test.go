@@ -59,7 +59,7 @@ func Test_HandleDeviceEndpointRequest(t *testing.T) {
 	req := &fosite.DeviceRequest{
 		Request: fosite.Request{
 			Client: &fosite.DefaultClient{
-				Audience: []string{"https://www.ory.sh/api"},
+				Audience: []string{"https://www.ory.com/api"},
 			},
 			Session: &fosite.DefaultSession{},
 		},
@@ -91,7 +91,7 @@ func Test_HandleDeviceEndpointRequestWithRetry(t *testing.T) {
 	req := &fosite.DeviceRequest{
 		Request: fosite.Request{
 			Client: &fosite.DefaultClient{
-				Audience: []string{"https://www.ory.sh/api"},
+				Audience: []string{"https://www.ory.com/api"},
 			},
 			Session: &fosite.DefaultSession{},
 		},

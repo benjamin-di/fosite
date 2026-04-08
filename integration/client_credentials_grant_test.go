@@ -72,7 +72,7 @@ func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.CoreStrategyPro
 		},
 		{
 			description: "non-whitelisted audience parameter does not fail the request",
-			params:      url.Values{"audience": {"https://www.ory.sh/not-api"}},
+			params:      url.Values{"audience": {"https://www.ory.com/not-api"}},
 			setup: func() {
 				oauthClient.Scopes = []string{"fosite"}
 			},
@@ -85,7 +85,7 @@ func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.CoreStrategyPro
 			},
 		},
 		{
-			params:      url.Values{"audience": {"https://www.ory.sh/api"}},
+			params:      url.Values{"audience": {"https://www.ory.com/api"}},
 			description: "should pass",
 			setup: func() {
 			},

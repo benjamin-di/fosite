@@ -57,7 +57,7 @@ func runAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvide
 	}{
 		{
 			description: "non-whitelisted audience parameter does not fail the request",
-			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.sh/not-api")},
+			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.com/not-api")},
 			setup: func() {
 				oauthClient = newOAuth2Client(ts)
 				state = "12345678901234567890"
@@ -76,7 +76,7 @@ func runAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvide
 		},
 		{
 			description: "should pass with audience granted by consent",
-			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.sh/api")},
+			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.com/api")},
 			setup: func() {
 				oauthClient = newOAuth2Client(ts)
 				state = "12345678901234567890"
@@ -87,7 +87,7 @@ func runAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvide
 				b.Session = new(defaultSession)
 				require.NoError(t, json.NewDecoder(r.Body).Decode(&b))
 				assert.Empty(t, b.RequestedAudience)
-				assert.EqualValues(t, fosite.Arguments{"https://www.ory.sh/api"}, b.GrantedAudience)
+				assert.EqualValues(t, fosite.Arguments{"https://www.ory.com/api"}, b.GrantedAudience)
 				assert.EqualValues(t, "foo-sub", b.Session.(*defaultSession).Subject)
 			},
 			authStatusCode: http.StatusOK,

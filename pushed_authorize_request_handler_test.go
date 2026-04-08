@@ -192,7 +192,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -231,7 +231,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -239,7 +239,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
-					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 					Secret:        []byte("1234"),
 				}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
@@ -252,7 +252,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					Client: &DefaultClient{
 						ResponseTypes: []string{"code token"}, RedirectURIs: []string{"https://foo.bar/cb"},
 						Scopes:   []string{"foo", "bar"},
-						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:   []byte("1234"),
 					},
 					RequestedScope:    []string{"foo", "bar"},
@@ -271,7 +271,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -279,7 +279,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
-					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 					Secret:        []byte("1234"),
 				}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
@@ -292,7 +292,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					Client: &DefaultClient{
 						ResponseTypes: []string{"code token"}, RedirectURIs: []string{"https://foo.bar/cb"},
 						Scopes:   []string{"foo", "bar"},
-						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:   []byte("1234"),
 					},
 					RequestedScope:    []string{"foo", "bar"},
@@ -351,7 +351,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -359,7 +359,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"web+application://callback"},
 					Scopes:        []string{"foo", "bar"},
-					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 					Secret:        []byte("1234"),
 				}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
@@ -372,7 +372,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					Client: &DefaultClient{
 						ResponseTypes: []string{"code token"}, RedirectURIs: []string{"web+application://callback"},
 						Scopes:   []string{"foo", "bar"},
-						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:   []byte("1234"),
 					},
 					RequestedScope:    []string{"foo", "bar"},
@@ -391,7 +391,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api  https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api  https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -399,7 +399,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					ResponseTypes: []string{"code token"},
 					RedirectURIs:  []string{"https://foo.bar/cb"},
 					Scopes:        []string{"foo", "bar"},
-					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+					Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 					Secret:        []byte("1234"),
 				}, nil).MaxTimes(2)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("1234")), gomock.Eq([]byte("1234"))).Return(nil)
@@ -412,7 +412,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 					Client: &DefaultClient{
 						ResponseTypes: []string{"code token"}, RedirectURIs: []string{"https://foo.bar/cb"},
 						Scopes:   []string{"foo", "bar"},
-						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience: []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:   []byte("1234"),
 					},
 					RequestedScope:    []string{"foo", "bar"},
@@ -500,7 +500,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
 				"response_mode": {"form_post"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -509,7 +509,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
 						ResponseTypes: []string{"code token"},
-						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:        []byte("1234"),
 					},
 					ResponseModes: []ResponseModeType{ResponseModeFormPost},
@@ -526,7 +526,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 							RedirectURIs:  []string{"https://foo.bar/cb"},
 							Scopes:        []string{"foo", "bar"},
 							ResponseTypes: []string{"code token"},
-							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 							Secret:        []byte("1234"),
 						},
 						ResponseModes: []ResponseModeType{ResponseModeFormPost},
@@ -547,7 +547,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -556,7 +556,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
 						ResponseTypes: []string{"code"},
-						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:        []byte("1234"),
 					},
 					ResponseModes: []ResponseModeType{ResponseModeQuery},
@@ -573,7 +573,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 							RedirectURIs:  []string{"https://foo.bar/cb"},
 							Scopes:        []string{"foo", "bar"},
 							ResponseTypes: []string{"code"},
-							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 							Secret:        []byte("1234"),
 						},
 						ResponseModes: []ResponseModeType{ResponseModeQuery},
@@ -594,7 +594,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 				"response_type": {"code token"},
 				"state":         {"strong-state"},
 				"scope":         {"foo bar"},
-				"audience":      {"https://cloud.ory.sh/api https://www.ory.sh/api"},
+				"audience":      {"https://cloud.ory.sh/api https://www.ory.com/api"},
 			},
 			mock: func() {
 				store.EXPECT().FositeClientManager().Return(clientManager).Times(2)
@@ -603,7 +603,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 						RedirectURIs:  []string{"https://foo.bar/cb"},
 						Scopes:        []string{"foo", "bar"},
 						ResponseTypes: []string{"code token"},
-						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+						Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 						Secret:        []byte("1234"),
 					},
 					ResponseModes: []ResponseModeType{ResponseModeFragment},
@@ -620,7 +620,7 @@ func TestNewPushedAuthorizeRequest(t *testing.T) {
 							RedirectURIs:  []string{"https://foo.bar/cb"},
 							Scopes:        []string{"foo", "bar"},
 							ResponseTypes: []string{"code token"},
-							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.sh/api"},
+							Audience:      []string{"https://cloud.ory.sh/api", "https://www.ory.com/api"},
 							Secret:        []byte("1234"),
 						},
 						ResponseModes: []ResponseModeType{ResponseModeFragment},

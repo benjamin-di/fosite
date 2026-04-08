@@ -40,7 +40,7 @@ const (
 	firstJWTBearerSubject  = "first-service-client"
 	secondJWTBearerSubject = "second-service-client"
 
-	tokenURL          = "https://www.ory.sh/api"
+	tokenURL          = "https://www.ory.com/api"
 	tokenRelativePath = "/token"
 
 	deviceAuthRelativePath = "/device/auth"
