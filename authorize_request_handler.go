@@ -17,6 +17,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite/i18n"
@@ -55,7 +56,11 @@ func requestObjectClaimValue(v interface{}) (string, error) {
 	}
 }
 
-func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.Context, request *AuthorizeRequest, isPARRequest bool) error {
+func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.Context, request *AuthorizeRequest, isPARRequest bool) (err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.authorizeRequestParametersFromOpenIDConnectRequest",
+		trace.WithAttributes(attribute.Bool("is_par_request", isPARRequest)))
+	defer otelx.End(span, &err)
+
 	var scope Arguments = RemoveEmpty(strings.Split(request.Form.Get("scope"), " "))
 
 	// Even if a scope parameter is present in the Request Object value, a scope parameter MUST always be passed using
@@ -237,7 +242,11 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 	return nil
 }
 
-func (f *Fosite) validateAuthorizeRedirectURI(_ *http.Request, request *AuthorizeRequest) error {
+func (f *Fosite) validateAuthorizeRedirectURI(ctx context.Context, request *AuthorizeRequest) (err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.validateAuthorizeRedirectURI")
+	_ = ctx
+	defer otelx.End(span, &err)
+
 	// Fetch redirect URI from request
 	rawRedirURI := request.Form.Get("redirect_uri")
 
@@ -438,7 +447,7 @@ func (f *Fosite) prepareAuthorizeRequestForErrorRedirect(ctx context.Context, r 
 		request.ResponseMode = ResponseModeDefault
 	}
 
-	if err := f.validateAuthorizeRedirectURI(r, request); err != nil {
+	if err := f.validateAuthorizeRedirectURI(ctx, request); err != nil {
 		return
 	}
 
@@ -453,7 +462,8 @@ func (f *Fosite) prepareAuthorizeRequestForErrorRedirect(ctx context.Context, r 
 }
 
 func (f *Fosite) NewAuthorizeRequest(ctx context.Context, r *http.Request) (_ AuthorizeRequester, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.NewAuthorizeRequest")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.NewAuthorizeRequest",
+		trace.WithAttributes(attribute.Bool("is_par_request", false)))
 	defer otelx.End(span, &err)
 
 	return f.newAuthorizeRequest(ctx, r, false)
@@ -525,7 +535,7 @@ func (f *Fosite) newAuthorizeRequest(ctx context.Context, r *http.Request, isPAR
 		request.SetRequestedScopes(scopes)
 	}
 
-	if err = f.validateAuthorizeRedirectURI(r, request); err != nil {
+	if err = f.validateAuthorizeRedirectURI(ctx, request); err != nil {
 		return request, err
 	}
 

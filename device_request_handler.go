@@ -52,14 +52,14 @@ func (f *Fosite) NewDeviceRequest(ctx context.Context, r *http.Request) (_ Devic
 		return request, errorsx.WithStack(ErrInvalidGrant.WithHint("The requested OAuth 2.0 Client does not have the 'urn:ietf:params:oauth:grant-type:device_code' grant."))
 	}
 
-	if err := f.validateDeviceScope(ctx, r, request); err != nil {
+	if err := f.validateDeviceScope(ctx, request); err != nil {
 		return request, err
 	}
 
 	return request, nil
 }
 
-func (f *Fosite) validateDeviceScope(ctx context.Context, r *http.Request, request *DeviceRequest) error {
+func (f *Fosite) validateDeviceScope(ctx context.Context, request *DeviceRequest) error {
 	scopes := Arguments(RemoveEmpty(strings.Split(request.Form.Get("scope"), " ")))
 	scopes, err := FilterRequestedScopes(f.Config.GetScopeStrategy(ctx), request.Client, scopes, f.Config.GetIgnoreUnknownScopes(ctx))
 	if err != nil {

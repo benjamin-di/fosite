@@ -1,21 +1,20 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
 // StringInSlice returns true if needle exists in haystack
 func StringInSlice(needle string, haystack []string) bool {
-	for _, b := range haystack {
-		if strings.ToLower(b) == strings.ToLower(needle) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(haystack, func(s string) bool {
+		return strings.EqualFold(s, needle)
+	})
 }
 
 func RemoveEmpty(args []string) (ret []string) {
