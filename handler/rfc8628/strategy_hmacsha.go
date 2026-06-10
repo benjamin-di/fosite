@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package rfc8628
@@ -27,6 +28,8 @@ type DefaultDeviceStrategy struct {
 }
 
 var _ RFC8628CodeStrategy = (*DefaultDeviceStrategy)(nil)
+
+const deviceCodePrefix = "pocket_id_dc_"
 
 // GenerateUserCode generates a user_code
 func (h *DefaultDeviceStrategy) GenerateUserCode(ctx context.Context) (string, string, error) {
@@ -69,7 +72,7 @@ func (h *DefaultDeviceStrategy) GenerateDeviceCode(ctx context.Context) (string,
 		return "", "", err
 	}
 
-	return "ory_dc_" + token, sig, nil
+	return deviceCodePrefix + token, sig, nil
 }
 
 // DeviceCodeSignature generates a device_code signature
@@ -88,7 +91,7 @@ func (h *DefaultDeviceStrategy) ValidateDeviceCode(ctx context.Context, r fosite
 		return errorsx.WithStack(fosite.ErrDeviceExpiredToken.WithHintf("Device code expired at '%s'.", exp))
 	}
 
-	return h.Enigma.Validate(ctx, strings.TrimPrefix(code, "ory_dc_"))
+	return h.Enigma.Validate(ctx, strings.TrimPrefix(code, deviceCodePrefix))
 }
 
 // ShouldRateLimit is used to decide whether a request should be rate-limited

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -29,7 +30,7 @@ func NewHMACSHAStrategy(
 }
 
 func (h *HMACSHAStrategy) getPrefix(part string) string {
-	return fmt.Sprintf("ory_%s_", part)
+	return fmt.Sprintf("pocket_id_%s_", part)
 }
 
 func (h *HMACSHAStrategy) trimPrefix(token, part string) string {

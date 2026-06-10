@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package rfc8628_test
@@ -53,7 +54,7 @@ func Test_HandleDeviceEndpointRequest(t *testing.T) {
 	assert.NotEmpty(t, resp.GetDeviceCode())
 	assert.NotEmpty(t, resp.GetUserCode())
 	assert.Equal(t, len(resp.GetUserCode()), 8)
-	assert.Contains(t, resp.GetDeviceCode(), "ory_dc_")
+	assert.Contains(t, resp.GetDeviceCode(), "pocket_id_dc_")
 	assert.Contains(t, resp.GetDeviceCode(), ".")
 	assert.Equal(t, resp.GetVerificationURI(), "www.test.com")
 }
