@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -27,6 +28,7 @@ func (f *Fosite) NewPushedAuthorizeRequest(ctx context.Context, r *http.Request)
 	defer otelx.End(span, &err)
 
 	request := NewAuthorizeRequest()
+	request.RedirectURIMatcher = f.Config.GetRedirectURIMatcher(ctx)
 	request.Request.Lang = i18n.GetLangFromRequest(f.Config.GetMessageCatalog(ctx), r)
 
 	if r.Method != "POST" {

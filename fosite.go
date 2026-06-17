@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -112,6 +113,7 @@ type Configurator interface {
 	AudienceStrategyProvider
 	ScopeStrategyProvider
 	RedirectSecureCheckerProvider
+	RedirectURIMatcherProvider
 	OmitRedirectScopeParamProvider
 	SanitationAllowedProvider
 	JWTScopeFieldProvider

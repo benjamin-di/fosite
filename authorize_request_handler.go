@@ -178,7 +178,7 @@ func (f *Fosite) validateAuthorizeRedirectURI(_ *http.Request, request *Authoriz
 	}
 
 	// Validate redirect uri
-	redirectURI, err := MatchRedirectURIWithClientRedirectURIs(rawRedirURI, request.Client)
+	redirectURI, err := request.matchRedirectURI(rawRedirURI)
 	if err != nil {
 		return err
 	} else if !IsValidRedirectURI(redirectURI) {
@@ -386,6 +386,7 @@ func (f *Fosite) NewAuthorizeRequest(ctx context.Context, r *http.Request) (_ Au
 
 func (f *Fosite) newAuthorizeRequest(ctx context.Context, r *http.Request, isPARRequest bool) (AuthorizeRequester, error) {
 	request := NewAuthorizeRequest()
+	request.RedirectURIMatcher = f.Config.GetRedirectURIMatcher(ctx)
 	request.Request.Lang = i18n.GetLangFromRequest(f.Config.GetMessageCatalog(ctx), r)
 
 	ctx = context.WithValue(ctx, RequestContextKey, r)

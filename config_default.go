@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -32,6 +33,7 @@ var (
 	_ ScopeStrategyProvider                        = (*Config)(nil)
 	_ AudienceStrategyProvider                     = (*Config)(nil)
 	_ RedirectSecureCheckerProvider                = (*Config)(nil)
+	_ RedirectURIMatcherProvider                   = (*Config)(nil)
 	_ RefreshTokenScopesProvider                   = (*Config)(nil)
 	_ DisableRefreshTokenValidationProvider        = (*Config)(nil)
 	_ AccessTokenIssuerProvider                    = (*Config)(nil)
@@ -140,6 +142,10 @@ type Config struct {
 
 	// RedirectSecureChecker is a function that returns true if the provided URL can be securely used as a redirect URL.
 	RedirectSecureChecker func(context.Context, *url.URL) bool
+
+	// RedirectURIMatcher resolves a requested redirect URI against the client's registered redirect URIs.
+	// Defaults to MatchRedirectURIWithClientRedirectURIs.
+	RedirectURIMatcher RedirectURIMatcher
 
 	// RefreshTokenScopes defines which OAuth scopes will be given refresh tokens during the authorization code grant exchange. This defaults to "offline" and "offline_access". When set to an empty array, all exchanges will be given refresh tokens.
 	RefreshTokenScopes []string
@@ -461,6 +467,14 @@ func (c *Config) GetRedirectSecureChecker(_ context.Context) func(context.Contex
 		return IsRedirectURISecure
 	}
 	return c.RedirectSecureChecker
+}
+
+// GetRedirectURIMatcher returns the matcher used to resolve redirect URIs. Defaults to fosite.MatchRedirectURIWithClientRedirectURIs.
+func (c *Config) GetRedirectURIMatcher(_ context.Context) RedirectURIMatcher {
+	if c.RedirectURIMatcher == nil {
+		return MatchRedirectURIWithClientRedirectURIs
+	}
+	return c.RedirectURIMatcher
 }
 
 // GetRefreshTokenScopes returns which scopes will provide refresh tokens.

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -111,4 +112,21 @@ func TestAuthorizeRequest(t *testing.T) {
 		assert.True(t, c.ar.GetRequestedScopes().Has("foo"))
 		assert.Equal(t, &DefaultSession{}, c.ar.GetSession())
 	}
+}
+
+func TestAuthorizeRequestIsRedirectURIValidUsesConfiguredMatcher(t *testing.T) {
+	redirectURI, err := url.Parse("https://tenant.example.com/callback")
+	require.NoError(t, err)
+
+	ar := NewAuthorizeRequest()
+	ar.RedirectURI = redirectURI
+	ar.Client = &DefaultClient{RedirectURIs: []string{"https://*.example.com/callback"}}
+	ar.RedirectURIMatcher = func(rawurl string, client Client) (*url.URL, error) {
+		assert.Equal(t, "https://tenant.example.com/callback", rawurl)
+		assert.Equal(t, []string{"https://*.example.com/callback"}, client.GetRedirectURIs())
+
+		return url.Parse(rawurl)
+	}
+
+	assert.True(t, ar.IsRedirectURIValid())
 }

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -73,6 +74,15 @@ type AudienceStrategyProvider interface {
 type RedirectSecureCheckerProvider interface {
 	// GetRedirectSecureChecker returns the redirect URL security validator.
 	GetRedirectSecureChecker(ctx context.Context) func(context.Context, *url.URL) bool
+}
+
+// RedirectURIMatcher resolves a requested redirect URI against the client's registered redirect URIs.
+type RedirectURIMatcher func(rawurl string, client Client) (*url.URL, error)
+
+// RedirectURIMatcherProvider returns the provider for configuring redirect URI matching.
+type RedirectURIMatcherProvider interface {
+	// GetRedirectURIMatcher returns the redirect URI matcher.
+	GetRedirectURIMatcher(ctx context.Context) RedirectURIMatcher
 }
 
 // RefreshTokenScopesProvider returns the provider for configuring the refresh token scopes.
