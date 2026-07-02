@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -78,7 +79,7 @@ func MatchRedirectURIWithClientRedirectURIs(rawurl string, client Client) (*url.
 		}
 	}
 
-	return nil, errorsx.WithStack(ErrInvalidRequest.WithHint("The 'redirect_uri' parameter does not match any of the OAuth 2.0 Client's pre-registered redirect urls."))
+	return nil, errorsx.WithStack(ErrInvalidRequest.WithHintf("The redirect_uri '%s' is not registered for this client.", rawurl))
 }
 
 // Match a requested  redirect URI against a pool of registered client URIs
