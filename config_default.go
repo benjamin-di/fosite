@@ -51,6 +51,7 @@ var (
 	_ GrantTypeJWTBearerCanSkipClientAuthProvider     = (*Config)(nil)
 	_ GrantTypeJWTBearerIDOptionalProvider            = (*Config)(nil)
 	_ GrantTypeJWTBearerIssuedDateOptionalProvider    = (*Config)(nil)
+	_ GrantTypeJWTBearerOmitAssertionAudienceProvider = (*Config)(nil)
 	_ GetJWTMaxDurationProvider                       = (*Config)(nil)
 	_ IDTokenLifespanProvider                         = (*Config)(nil)
 	_ IDTokenIssuerProvider                           = (*Config)(nil)
@@ -191,6 +192,11 @@ type Config struct {
 
 	// GrantTypeJWTBearerIssuedDateOptional indicates, if "iat" (issued at) claim required or not in JWT.
 	GrantTypeJWTBearerIssuedDateOptional bool
+
+	// GrantTypeJWTBearerOmitAssertionAudience indicates whether the audience from the assertion JWT should be
+	// omitted from the resulting access token. The zero value (false) copies the assertion audience into the
+	// access token; the Ory Hydra configuration default is true (omit), see driver/config.
+	GrantTypeJWTBearerOmitAssertionAudience bool
 
 	// GrantTypeJWTBearerMaxDuration sets the maximum time after JWT issued date, during which the JWT is considered valid.
 	GrantTypeJWTBearerMaxDuration time.Duration
@@ -360,6 +366,11 @@ func (c *Config) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Context) bo
 // GetGrantTypeJWTBearerIDOptional returns the GrantTypeJWTBearerIDOptional field.
 func (c *Config) GetGrantTypeJWTBearerIDOptional(ctx context.Context) bool {
 	return c.GrantTypeJWTBearerIDOptional
+}
+
+// GetGrantTypeJWTBearerOmitAssertionAudience returns GrantTypeJWTBearerOmitAssertionAudience.
+func (c *Config) GetGrantTypeJWTBearerOmitAssertionAudience(ctx context.Context) bool {
+	return c.GrantTypeJWTBearerOmitAssertionAudience
 }
 
 // GetGrantTypeJWTBearerCanSkipClientAuth returns the GrantTypeJWTBearerCanSkipClientAuth field.
