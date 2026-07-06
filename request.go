@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -50,6 +51,10 @@ func (a *Request) SetID(id string) {
 
 func (a *Request) GetRequestForm() url.Values {
 	return a.Form
+}
+
+func (a *Request) GetResource() (string, error) {
+	return GetResourceIndicator(a.Form)
 }
 
 func (a *Request) GetRequestedAt() time.Time {

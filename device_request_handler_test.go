@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -88,6 +89,15 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 		expectedError: ErrInvalidRequest,
+	}, {
+		description: "fails because resource is malformed",
+		form: url.Values{
+			"client_id": {"client_id"},
+			"resource":  {"https://api.example.com#fragment"},
+		},
+		method:        "POST",
+		mock:          func() {},
+		expectedError: ErrInvalidTarget,
 	}, {
 		description: "fails because it doesn't have the proper grant",
 		form: url.Values{

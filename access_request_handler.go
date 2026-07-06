@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -69,6 +70,9 @@ func (f *Fosite) NewAccessRequest(ctx context.Context, r *http.Request, session 
 	accessRequest.GrantTypes = RemoveEmpty(strings.Split(r.PostForm.Get("grant_type"), " "))
 	if len(accessRequest.GrantTypes) < 1 {
 		return accessRequest, errorsx.WithStack(ErrInvalidRequest.WithHint("Request parameter 'grant_type' is missing"))
+	}
+	if _, err := ValidateResourceIndicator(accessRequest.GetRequestForm()); err != nil {
+		return accessRequest, err
 	}
 
 	client, clientErr := f.AuthenticateClient(ctx, r, r.PostForm)

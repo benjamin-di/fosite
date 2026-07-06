@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -33,6 +34,9 @@ func (f *Fosite) NewDeviceRequest(ctx context.Context, r *http.Request) (_ Devic
 		return request, errorsx.WithStack(ErrInvalidRequest.WithHint("The POST body can not be empty."))
 	}
 	request.Form = r.PostForm
+	if _, err := ValidateResourceIndicator(request.GetRequestForm()); err != nil {
+		return request, err
+	}
 
 	client, clientErr := f.AuthenticateClient(ctx, r, r.PostForm)
 	if clientErr != nil {

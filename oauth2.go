@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -268,6 +269,9 @@ type Requester interface {
 
 	// GetRequestForm returns the request's form input.
 	GetRequestForm() url.Values
+
+	// GetResource returns the RFC 8707 resource.
+	GetResource() (resource string, err error)
 
 	// Merge merges the argument into the method receiver.
 	Merge(requester Requester)
