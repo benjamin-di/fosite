@@ -60,6 +60,14 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 	}
 	strategyProvider.EXPECT().DeviceCodeStrategy().Return(strategy).AnyTimes()
 
+	// signature is the storage key production derives from the device_code form
+	// value. Both GetOpenIDConnectSession and DeleteOpenIDConnectSession must be
+	// keyed by it; pinning both mock expectations to signature guards against the
+	// two diverging (the OIDC session-leak regression).
+	signature, err := strategy.DeviceCodeSignature(context.Background(), "ory_dc_stub.sigpart")
+	require.NoError(t, err)
+	require.NotEmpty(t, signature)
+
 	signer := &jwt.DefaultSigner{
 		GetPrivateKey: func(ctx context.Context) (interface{}, error) {
 			return key, nil
@@ -107,7 +115,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"authorization_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
@@ -120,14 +128,14 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
 			aresp: fosite.NewAccessResponse(),
 			setup: func(areq *fosite.AccessRequest) {
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(nil, openid.ErrNoSessionFound)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(nil, openid.ErrNoSessionFound)
 			},
 			expectErr: fosite.ErrUnknownRequest,
 		},
@@ -137,13 +145,13 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
 			setup: func(areq *fosite.AccessRequest) {
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(nil, errors.New(""))
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(nil, errors.New(""))
 			},
 			expectErr: fosite.ErrServerError,
 		},
@@ -153,7 +161,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
@@ -166,7 +174,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 				}
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrMisconfiguration,
 		},
@@ -176,7 +184,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
@@ -188,7 +196,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 				}
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrServerError,
 		},
@@ -198,7 +206,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
@@ -211,7 +219,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 				}
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrServerError,
 		},
@@ -221,7 +229,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
 				Request: fosite.Request{
 					Client:  client,
-					Form:    url.Values{"device_code": []string{"device_code"}},
+					Form:    url.Values{"device_code": []string{"ory_dc_stub.sigpart"}},
 					Session: session,
 				},
 			},
@@ -234,8 +242,8 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 				}
 				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(2)
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
-				store.EXPECT().DeleteOpenIDConnectSession(gomock.Any(), gomock.Any()).Return(nil)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), signature, areq).Return(authreq, nil)
+				store.EXPECT().DeleteOpenIDConnectSession(gomock.Any(), signature).Return(nil)
 			},
 			check: func(t *testing.T, aresp *fosite.AccessResponse) {
 				assert.NotEmpty(t, aresp.GetExtra("id_token"))
