@@ -39,6 +39,7 @@ var (
 	_ RefreshTokenScopesProvider                      = (*Config)(nil)
 	_ DisableRefreshTokenValidationProvider           = (*Config)(nil)
 	_ AccessTokenIssuerProvider                       = (*Config)(nil)
+	_ AuthorizationResponseIssuerProvider             = (*Config)(nil)
 	_ JWTScopeFieldProvider                           = (*Config)(nil)
 	_ AllowedPromptsProvider                          = (*Config)(nil)
 	_ OmitRedirectScopeParamProvider                  = (*Config)(nil)
@@ -91,6 +92,9 @@ type Config struct {
 
 	// IDTokenIssuer sets the default issuer of the ID Token.
 	IDTokenIssuer string
+
+	// AuthorizationResponseIssuer sets the RFC 9207 issuer included in successful and error authorization responses. If empty, the issuer is omitted.
+	AuthorizationResponseIssuer string
 
 	// Sets how long a device user/device code pair is valid for
 	DeviceAndUserCodeLifespan time.Duration
@@ -342,6 +346,10 @@ func (c *Config) GetSendDebugMessagesToClients(ctx context.Context) bool {
 
 func (c *Config) GetIDTokenIssuer(ctx context.Context) string {
 	return c.IDTokenIssuer
+}
+
+func (c *Config) GetAuthorizationResponseIssuer(ctx context.Context) string {
+	return c.AuthorizationResponseIssuer
 }
 
 // GetGrantTypeJWTBearerIssuedDateOptional returns the GrantTypeJWTBearerIssuedDateOptional field.

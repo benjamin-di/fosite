@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -9,6 +10,10 @@ import (
 )
 
 func (f *Fosite) WriteAuthorizeResponse(ctx context.Context, rw http.ResponseWriter, ar AuthorizeRequester, resp AuthorizeResponder) {
+	if issuer := f.Config.GetAuthorizationResponseIssuer(ctx); issuer != "" {
+		resp.GetParameters().Set("iss", issuer)
+	}
+
 	// Set custom headers, e.g. "X-MySuperCoolCustomHeader" or "X-DONT-CACHE-ME"...
 	wh := rw.Header()
 	rh := resp.GetHeader()

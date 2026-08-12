@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -46,6 +47,9 @@ func (f *Fosite) WriteAuthorizeError(ctx context.Context, rw http.ResponseWriter
 
 	errors := rfcerr.ToValues()
 	errors.Set("state", ar.GetState())
+	if issuer := f.Config.GetAuthorizationResponseIssuer(ctx); issuer != "" {
+		errors.Set("iss", issuer)
+	}
 
 	var redirectURIString string
 	if ar.GetResponseMode() == ResponseModeFormPost {

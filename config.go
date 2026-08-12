@@ -137,6 +137,12 @@ type AccessTokenIssuerProvider interface {
 	GetAccessTokenIssuer(ctx context.Context) string
 }
 
+// AuthorizationResponseIssuerProvider returns the provider for configuring the RFC 9207 issuer in authorization responses.
+type AuthorizationResponseIssuerProvider interface {
+	// GetAuthorizationResponseIssuer returns the issuer included in authorization responses.
+	GetAuthorizationResponseIssuer(ctx context.Context) string
+}
+
 // IDTokenIssuerProvider returns the provider for configuring the ID token issuer.
 type IDTokenIssuerProvider interface {
 	// GetIDTokenIssuer returns the ID token issuer.

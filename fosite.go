@@ -101,6 +101,7 @@ var _ OAuth2Provider = (*Fosite)(nil)
 
 type Configurator interface {
 	IDTokenIssuerProvider
+	AuthorizationResponseIssuerProvider
 	IDTokenLifespanProvider
 	AllowedPromptsProvider
 	EnforcePKCEProvider
