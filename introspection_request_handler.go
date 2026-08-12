@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -138,7 +139,7 @@ func (f *Fosite) NewIntrospectionRequest(ctx context.Context, r *http.Request, s
 			return &IntrospectionResponse{Active: false}, errorsx.WithStack(ErrRequestUnauthorized.WithHint("Unable to decode OAuth 2.0 Client Secret from HTTP basic authorization header, make sure it is properly encoded.").WithWrap(err).WithDebug(err.Error()))
 		}
 
-		client, err := f.Store.GetClient(ctx, clientID)
+		client, err := f.resolveClient(ctx, clientID)
 		if err != nil {
 			return &IntrospectionResponse{Active: false}, errorsx.WithStack(ErrRequestUnauthorized.WithHint("Unable to find OAuth 2.0 Client from HTTP basic authorization header.").WithWrap(err).WithDebug(err.Error()))
 		}
