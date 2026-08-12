@@ -113,6 +113,7 @@ type Configurator interface {
 	AudienceStrategyProvider
 	ScopeStrategyProvider
 	IgnoreUnknownScopesProvider
+	SupportedRequestObjectSigningAlgorithmsProvider
 	RedirectSecureCheckerProvider
 	RedirectURIMatcherProvider
 	OmitRedirectScopeParamProvider
