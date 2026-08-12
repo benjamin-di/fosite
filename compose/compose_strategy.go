@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package compose
@@ -41,6 +42,13 @@ func NewOAuth2JWTStrategy(keyGetter func(context.Context) (interface{}, error), 
 		Signer:          &jwt.DefaultSigner{GetPrivateKey: keyGetter},
 		HMACSHAStrategy: strategy,
 		Config:          config,
+	}
+}
+
+// NewOAuth2RFC9068JWTStrategy creates a JWT strategy that issues RFC 9068 access tokens while retaining opaque refresh tokens and authorization codes
+func NewOAuth2RFC9068JWTStrategy(keyGetter func(context.Context) (interface{}, error), strategy oauth2.CoreStrategy, config fosite.Configurator) *oauth2.RFC9068JWTStrategy {
+	return &oauth2.RFC9068JWTStrategy{
+		DefaultJWTStrategy: NewOAuth2JWTStrategy(keyGetter, strategy, config),
 	}
 }
 
