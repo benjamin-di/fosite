@@ -101,6 +101,12 @@ func main() {
 			if !bytes.Equal(stripManagedHeader(current), stripManagedHeader(original)) {
 				kind = inheritedModified
 			}
+		} else if oryCopyright, err := findOryCopyright(current); err == nil {
+			// Files ported from upstream after the base commit keep Ory's
+			// copyright. The fork adapts them (for example their import paths),
+			// so they are marked as modified.
+			kind = inheritedModified
+			upstreamCopyright = oryCopyright
 		}
 
 		year := newFileYear(repositoryRoot, path, current)
