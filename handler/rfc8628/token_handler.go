@@ -149,7 +149,9 @@ func (c *DeviceCodeTokenEndpointHandler) HandleTokenEndpointRequest(ctx context.
 	var ar fosite.DeviceRequester
 	if ar, err = c.session(ctx, requester, signature); err != nil {
 		if ar != nil && (errors.Is(err, fosite.ErrInvalidatedAuthorizeCode) || errors.Is(err, fosite.ErrInvalidatedDeviceCode)) {
-			return c.revokeTokens(ctx, requester.GetID())
+			// Revoke the tokens of the grant the reused device code was issued
+			// for. This request's own ID was generated for it and has no tokens.
+			return c.revokeTokens(ctx, ar.GetID())
 		}
 
 		return err
@@ -206,7 +208,7 @@ func (c *DeviceCodeTokenEndpointHandler) canIssueRefreshToken(ctx context.Contex
 }
 
 func (c *DeviceCodeTokenEndpointHandler) revokeTokens(ctx context.Context, reqId string) error {
-	hint := "The authorization code has already been used."
+	hint := "The device code has already been used."
 	var debug strings.Builder
 
 	revokeAndAppendErr := func(tokenType string, revokeFunc func(context.Context, string) error) {
