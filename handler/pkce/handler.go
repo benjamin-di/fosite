@@ -146,10 +146,15 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err := c.Storage.PKCERequestStorage().DeletePKCERequestSession(ctx, code, signature); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
+	if err := c.verify(ctx, verifier, pkceRequest); err != nil {
+		return err
 	}
 
+	return nil
+}
+
+// verify checks the code verifier against the challenge stored with the authorization code.
+func (c *Handler) verify(ctx context.Context, verifier string, pkceRequest fosite.Requester) error {
 	challenge := pkceRequest.GetRequestForm().Get("code_challenge")
 	method := pkceRequest.GetRequestForm().Get("code_challenge_method")
 	client := pkceRequest.GetClient()
@@ -158,6 +163,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 	}
 
 	nc := len(challenge)
+	nv := len(verifier)
 
 	if !c.Config.GetEnforcePKCE(ctx) && nc == 0 && nv == 0 {
 		return nil
@@ -229,7 +235,21 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 	return nil
 }
 
-func (c *Handler) PopulateTokenEndpointResponse(ctx context.Context, requester fosite.AccessRequester, responder fosite.AccessResponder) error {
+// PopulateTokenEndpointResponse consumes the PKCE session. It runs after the
+// authorization code handler invalidated the code, so a token request that
+// fails in between cannot be retried without the verifier. The PKCE handler
+// must therefore be composed after the authorization code handler.
+func (c *Handler) PopulateTokenEndpointResponse(ctx context.Context, requester fosite.AccessRequester, _ fosite.AccessResponder) error {
+	if !c.CanHandleTokenEndpointRequest(ctx, requester) {
+		return errorsx.WithStack(fosite.ErrUnknownRequest)
+	}
+
+	code := requester.GetRequestForm().Get("code")
+	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
+	if err := c.Storage.PKCERequestStorage().DeletePKCERequestSession(ctx, code, signature); err != nil && !errors.Is(err, fosite.ErrNotFound) {
+		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
+	}
+
 	return nil
 }
 

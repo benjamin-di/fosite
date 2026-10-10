@@ -423,3 +423,54 @@ type testerr struct {
 func (e *testerr) Error() string {
 	return e.RFC6749Error.WithExposeDebug(true).GetDescription()
 }
+
+func TestPKCEHandleTokenEndpointRequestConsumesSessionOnlyAfterVerification(t *testing.T) {
+	ctx := context.Background()
+	s := storage.NewMemoryStore()
+	h := &pkce.Handler{
+		Storage:  s,
+		Strategy: &mockStrategyProvider{strategy: &mockCodeStrategy{signature: "signature"}},
+		Config:   &fosite.Config{},
+	}
+
+	verifier := "KGCt4m8AmjUvIR5ArTByrmehjtbxn1A49YpTZhsH8N7fhDr7LQayn9xx6mck"
+	sum := sha256.Sum256([]byte(verifier))
+	ar := fosite.NewAuthorizeRequest()
+	ar.Client = &fosite.DefaultClient{}
+	ar.Form.Set("code_challenge", base64.RawURLEncoding.EncodeToString(sum[:]))
+	ar.Form.Set("code_challenge_method", "S256")
+	require.NoError(t, s.CreatePKCERequestSession(ctx, "signature", ar))
+
+	newRequest := func(verifier string) *fosite.AccessRequest {
+		r := fosite.NewAccessRequest(&fosite.DefaultSession{})
+		r.GrantTypes = fosite.Arguments{"authorization_code"}
+		r.Client = &fosite.DefaultClient{}
+		r.Form.Set("code", "code")
+		if verifier != "" {
+			r.Form.Set("code_verifier", verifier)
+		}
+		return r
+	}
+
+	// A missing or wrong verifier fails without consuming the session, so the
+	// attempt neither burns the legitimate redemption nor removes the evidence
+	// that PKCE was required.
+	require.ErrorIs(t, h.HandleTokenEndpointRequest(ctx, newRequest("")), fosite.ErrInvalidGrant)
+	_, err := s.GetPKCERequestSession(ctx, "code", "signature", nil)
+	require.NoError(t, err)
+	require.ErrorIs(t, h.HandleTokenEndpointRequest(ctx, newRequest("wrongwrongwrongwrongwrongwrongwrongwrongwrongwrong")), fosite.ErrInvalidGrant)
+	_, err = s.GetPKCERequestSession(ctx, "code", "signature", nil)
+	require.NoError(t, err)
+
+	// The matching verifier passes, but the session is only consumed once the
+	// token response is populated, i.e. after the authorization code was
+	// invalidated, so a token request that fails in between still needs it.
+	require.NoError(t, h.HandleTokenEndpointRequest(ctx, newRequest(verifier)))
+	_, err = s.GetPKCERequestSession(ctx, "code", "signature", nil)
+	require.NoError(t, err)
+
+	require.ErrorIs(t, h.PopulateTokenEndpointResponse(ctx, fosite.NewAccessRequest(&fosite.DefaultSession{}), fosite.NewAccessResponse()), fosite.ErrUnknownRequest)
+	require.NoError(t, h.PopulateTokenEndpointResponse(ctx, newRequest(verifier), fosite.NewAccessResponse()))
+	_, err = s.GetPKCERequestSession(ctx, "code", "signature", nil)
+	require.ErrorIs(t, err, fosite.ErrNotFound)
+}
