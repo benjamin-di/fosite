@@ -70,6 +70,29 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					areq: &fosite.AccessRequest{
 						GrantTypes: fosite.Arguments{"authorization_code"},
 						Request: fosite.Request{
+							Form: url.Values{},
+							Client: &fosite.DefaultClient{
+								GrantTypes: fosite.Arguments{"authorization_code"},
+							},
+							Session:     &fosite.DefaultSession{},
+							RequestedAt: time.Now().UTC(),
+						},
+					},
+					description: "should fail with invalid_grant because a concurrent request redeemed the code",
+					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
+						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						require.NoError(t, err)
+						areq.Form.Set("code", code)
+
+						require.NoError(t, store.CreateAuthorizeCodeSession(context.Background(), sig, areq))
+						require.NoError(t, store.InvalidateAuthorizeCodeSession(context.Background(), code, sig))
+					},
+					expectErr: fosite.ErrInvalidGrant,
+				},
+				{
+					areq: &fosite.AccessRequest{
+						GrantTypes: fosite.Arguments{"authorization_code"},
+						Request: fosite.Request{
 							Form: url.Values{"code": []string{"foo.bar"}},
 							Client: &fosite.DefaultClient{
 								GrantTypes: fosite.Arguments{"authorization_code"},

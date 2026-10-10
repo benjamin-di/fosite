@@ -123,6 +123,9 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	signature := c.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, code)
 	authorizeRequest, err := c.Storage.AuthorizeCodeStorage().GetAuthorizeCodeSession(ctx, code, signature, requester.GetSession())
 	if err != nil {
+		if errors.Is(err, fosite.ErrInvalidatedAuthorizeCode) {
+			return errorsx.WithStack(fosite.ErrInvalidGrant.WithHint("The authorization code has already been used.").WithWrap(err).WithDebug(err.Error()))
+		}
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	} else if err := c.Strategy.AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, requester, code); err != nil {
 		// This needs to happen after store retrieval for the session to be hydrated properly
