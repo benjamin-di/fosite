@@ -69,6 +69,11 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 
 	ar, err := c.session(ctx, requester, signature)
 	if err != nil {
+		// A concurrent request redeemed the device code after this request
+		// passed HandleTokenEndpointRequest.
+		if errors.Is(err, fosite.ErrInvalidatedDeviceCode) {
+			return errorsx.WithStack(fosite.ErrInvalidGrant.WithHint("The device code has already been used.").WithWrap(err).WithDebug(err.Error()))
+		}
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
@@ -112,6 +117,14 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 		return nil
 	})
 	if err != nil {
+		// A storage call inside the transaction may return a deliberate
+		// client-facing grant error (e.g. invalid_grant when a device code was
+		// already used). Preserve its status instead of masking it as a
+		// server error, so a losing concurrent redemption returns 400
+		// invalid_grant rather than 500.
+		if errors.Is(err, fosite.ErrInvalidGrant) {
+			return errorsx.WithStack(err)
+		}
 		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
