@@ -7,15 +7,15 @@ package compose
 import (
 	"context"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 type Factory func(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{}
 
 // Compose takes a config, a storage, a strategy and handlers to instantiate an OAuth2Provider:
 //
-//	 import "github.com/ory/fosite/compose"
+//	 import "github.com/pocket-id/fosite/compose"
 //
 //	 // var storage = new(MyFositeStorage)
 //	 var config = Config {

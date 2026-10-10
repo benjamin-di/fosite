@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"strings"
 
-	enigma "github.com/ory/fosite/token/hmac"
+	enigma "github.com/pocket-id/fosite/token/hmac"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 var (

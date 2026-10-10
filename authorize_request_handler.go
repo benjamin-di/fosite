@@ -20,10 +20,10 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/fosite/i18n"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
+	"github.com/pocket-id/fosite/i18n"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 func wrapSigningKeyFailure(outer *RFC6749Error, inner error) *RFC6749Error {
@@ -57,7 +57,7 @@ func requestObjectClaimValue(v interface{}) (string, error) {
 }
 
 func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.Context, request *AuthorizeRequest, isPARRequest bool) (err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.authorizeRequestParametersFromOpenIDConnectRequest",
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "Fosite.authorizeRequestParametersFromOpenIDConnectRequest",
 		trace.WithAttributes(attribute.Bool("is_par_request", isPARRequest)))
 	defer otelx.End(span, &err)
 
@@ -243,7 +243,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 }
 
 func (f *Fosite) validateAuthorizeRedirectURI(ctx context.Context, request *AuthorizeRequest) (err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.validateAuthorizeRedirectURI")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "Fosite.validateAuthorizeRedirectURI")
 	_ = ctx
 	defer otelx.End(span, &err)
 
@@ -462,7 +462,7 @@ func (f *Fosite) prepareAuthorizeRequestForErrorRedirect(ctx context.Context, r 
 }
 
 func (f *Fosite) NewAuthorizeRequest(ctx context.Context, r *http.Request) (_ AuthorizeRequester, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.NewAuthorizeRequest",
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "Fosite.NewAuthorizeRequest",
 		trace.WithAttributes(attribute.Bool("is_par_request", false)))
 	defer otelx.End(span, &err)
 

@@ -9,7 +9,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 func TestMemoryStore_Authenticate(t *testing.T) {

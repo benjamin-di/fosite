@@ -7,7 +7,7 @@ package rfc8628
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 // DeviceAuthStorage handles the device auth session storage

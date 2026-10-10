@@ -18,16 +18,16 @@ import (
 	goauth "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/integration/clients"
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/internal/gen"
-	"github.com/ory/fosite/storage"
-	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/compose"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/integration/clients"
+	"github.com/pocket-id/fosite/internal"
+	"github.com/pocket-id/fosite/internal/gen"
+	"github.com/pocket-id/fosite/storage"
+	"github.com/pocket-id/fosite/token/hmac"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 const (

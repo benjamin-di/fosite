@@ -7,7 +7,7 @@ package openid
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 var ErrNoSessionFound = fosite.ErrNotFound

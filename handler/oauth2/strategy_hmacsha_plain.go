@@ -10,8 +10,8 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/fosite"
-	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/pocket-id/fosite"
+	enigma "github.com/pocket-id/fosite/token/hmac"
 )
 
 var (

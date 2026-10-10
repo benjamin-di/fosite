@@ -14,9 +14,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/token/hmac"
 )
 
 var hmacshaStrategyDefault = rfc8628.DefaultDeviceStrategy{

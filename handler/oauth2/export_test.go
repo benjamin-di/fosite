@@ -7,7 +7,7 @@ package oauth2
 import (
 	"time"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 func CallGetExpiresIn(r fosite.Requester, key fosite.TokenType, defaultLifespan time.Duration, now time.Time) time.Duration {

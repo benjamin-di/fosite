@@ -7,7 +7,7 @@ package rfc8628
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 // DeviceRateLimitStrategy handles the rate limiting strategy

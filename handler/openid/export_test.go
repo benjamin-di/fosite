@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 func CallGenerateIDToken(ctx context.Context, lifespan time.Duration, fosr fosite.Requester, h *IDTokenHandleHelper) (token string, err error) {

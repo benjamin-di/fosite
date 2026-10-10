@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package hmac is the default implementation for generating and validating challenges. It uses SHA-512/256 to
@@ -19,7 +20,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 type HMACStrategyConfigurator interface {

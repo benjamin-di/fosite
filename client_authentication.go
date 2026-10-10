@@ -24,7 +24,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 // ClientAuthenticationStrategy provides a method signature for authenticating a client request
@@ -34,7 +34,7 @@ type ClientAuthenticationStrategy func(context.Context, *http.Request, url.Value
 const clientAssertionJWTBearerType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
 
 func (f *Fosite) findClientPublicJWK(ctx context.Context, oidcClient OpenIDConnectClient, t *jwt.Token, expectsRSAKey bool) (jwk interface{}, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.findClientPublicJWK",
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "Fosite.findClientPublicJWK",
 		trace.WithAttributes(
 			attribute.String("jwks_uri", oidcClient.GetJSONWebKeysURI()),
 			attribute.Bool("expects_rsa_key", expectsRSAKey),
@@ -91,7 +91,7 @@ func (f *Fosite) AuthenticateClient(ctx context.Context, r *http.Request, form u
 // DefaultClientAuthenticationStrategy provides the fosite's default client authentication strategy,
 // HTTP Basic Authentication and JWT Bearer
 func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *http.Request, form url.Values) (_ Client, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "Fosite.DefaultClientAuthenticationStrategy")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "Fosite.DefaultClientAuthenticationStrategy")
 	defer otelx.End(span, &err)
 
 	if assertionType := form.Get("client_assertion_type"); assertionType == clientAssertionJWTBearerType {

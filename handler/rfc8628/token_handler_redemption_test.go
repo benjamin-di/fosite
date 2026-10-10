@@ -12,10 +12,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/storage"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/storage"
 )
 
 // deviceTokenStorage is the storage the device code token handler needs.

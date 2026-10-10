@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/token/hmac"
 )
 
 var hmacshaStrategy = oauth2.NewHMACSHAStrategy(

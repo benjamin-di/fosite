@@ -11,9 +11,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/x/errorsx"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/hmac"
 )
 
 const (

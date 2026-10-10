@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/fosite/internal/gen"
+	"github.com/pocket-id/fosite/internal/gen"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"

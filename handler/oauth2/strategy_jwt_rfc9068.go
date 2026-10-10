@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 // RFC9068JWTType is the media type used to identify RFC 9068 access tokens in the JWT typ header

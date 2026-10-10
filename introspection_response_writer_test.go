@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -18,8 +19,8 @@ import (
 	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
 
-	. "github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	. "github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/internal"
 )
 
 func TestWriteIntrospectionError(t *testing.T) {

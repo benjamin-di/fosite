@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
 
-	. "github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	. "github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/internal"
 )
 
 // Should pass

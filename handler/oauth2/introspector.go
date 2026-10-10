@@ -7,8 +7,8 @@ package oauth2
 import (
 	"context"
 
-	"github.com/ory/fosite"
 	"github.com/ory/x/errorsx"
+	"github.com/pocket-id/fosite"
 )
 
 var _ fosite.TokenIntrospector = (*CoreValidator)(nil)

@@ -11,17 +11,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/internal/gen"
+	"github.com/pocket-id/fosite/internal"
+	"github.com/pocket-id/fosite/internal/gen"
 
 	"github.com/stretchr/testify/assert"
 	gomock "go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/storage"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/storage"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 func makeOpenIDConnectImplicitHandler(minParameterEntropy int) openid.OpenIDConnectImplicitHandler {

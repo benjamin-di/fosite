@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package openid
@@ -13,9 +14,9 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/go-convenience/stringslice"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 const defaultExpiryTime = time.Hour

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite_test
@@ -10,10 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	. "github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/par"
-	"github.com/ory/fosite/handler/rfc8628"
+	. "github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/par"
+	"github.com/pocket-id/fosite/handler/rfc8628"
 )
 
 func TestAuthorizeEndpointHandlers(t *testing.T) {

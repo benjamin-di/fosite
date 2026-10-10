@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -10,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/ory/fosite/i18n"
+	"github.com/pocket-id/fosite/i18n"
 )
 
 func TestRFC6749Error(t *testing.T) {

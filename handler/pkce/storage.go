@@ -7,7 +7,7 @@ package pkce
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 type (

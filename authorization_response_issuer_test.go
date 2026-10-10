@@ -13,7 +13,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	. "github.com/ory/fosite"
+	. "github.com/pocket-id/fosite"
 )
 
 const authorizationResponseIssuer = "https://issuer.example.com/"

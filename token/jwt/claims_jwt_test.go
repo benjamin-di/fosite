@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package jwt_test
@@ -9,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/ory/fosite/token/jwt"
+	. "github.com/pocket-id/fosite/token/jwt"
 )
 
 var jwtClaims = &JWTClaims{

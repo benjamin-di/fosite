@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package fosite
@@ -7,8 +8,8 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/text/language"
 
-	"github.com/ory/fosite/i18n"
 	"github.com/ory/x/errorsx"
+	"github.com/pocket-id/fosite/i18n"
 )
 
 // AddLocalizerToErr augments the error object with the localizer

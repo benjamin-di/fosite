@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite/internal/gen"
+	"github.com/pocket-id/fosite/internal/gen"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/stretchr/testify/assert"

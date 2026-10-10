@@ -12,7 +12,7 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 var _ fosite.AuthorizeEndpointHandler = (*AuthorizeImplicitGrantHandler)(nil)

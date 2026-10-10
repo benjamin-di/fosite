@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package hmac
@@ -9,7 +10,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

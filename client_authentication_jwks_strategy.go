@@ -21,7 +21,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 )
 
-const defaultJWKSFetcherStrategyCachePrefix = "github.com/ory/fosite.DefaultJWKSFetcherStrategy:"
+const defaultJWKSFetcherStrategyCachePrefix = "github.com/pocket-id/fosite.DefaultJWKSFetcherStrategy:"
 
 // JWKSFetcherStrategy is a strategy which pulls (optionally caches) JSON Web Key Sets from a location,
 // typically a client's jwks_uri.
@@ -100,7 +100,7 @@ func JWKSFetcherWithHTTPClientSource(clientSourceFunc func(ctx context.Context) 
 // the strategy to fetch the key from the remote. If forceRefresh is false, the strategy may use a caching strategy
 // to fetch the key.
 func (s *DefaultJWKSFetcherStrategy) Resolve(ctx context.Context, location string, ignoreCache bool) (_ *jose.JSONWebKeySet, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/ory/fosite").Start(ctx, "DefaultJWKSFetcherStrategy.Resolve",
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("github.com/pocket-id/fosite").Start(ctx, "DefaultJWKSFetcherStrategy.Resolve",
 		trace.WithAttributes(
 			attribute.String("location", location),
 			attribute.Bool("cache.ignore", ignoreCache),

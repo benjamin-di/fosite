@@ -5,8 +5,8 @@
 package compose
 
 import (
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/verifiable"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/verifiable"
 )
 
 // OIDCUserinfoVerifiableCredentialFactory creates a verifiable credentials

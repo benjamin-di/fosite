@@ -24,9 +24,9 @@ import (
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/rfc7523"
-	"github.com/ory/fosite/internal"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/rfc7523"
+	"github.com/pocket-id/fosite/internal"
 )
 
 // #nosec:gosec G101 - False Positive

@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package oauth2
@@ -8,8 +9,8 @@ import (
 
 	"github.com/mohae/deepcopy"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 type JWTSessionContainer interface {

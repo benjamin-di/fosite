@@ -7,12 +7,12 @@ package compose
 import (
 	"context"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/token/hmac"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 type CommonStrategyProvider struct {

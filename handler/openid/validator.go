@@ -15,8 +15,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 var defaultPrompts = []string{"login", "none", "consent", "select_account"}

@@ -13,14 +13,14 @@ import (
 
 	gomock "go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite/internal"
+	"github.com/pocket-id/fosite/internal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/storage"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/storage"
 )
 
 type mockStrategyProvider struct {

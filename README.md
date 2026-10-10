@@ -29,11 +29,8 @@ change between releases.
 
 ## Usage
 
-The module path is still `github.com/ory/fosite`, so code imports the original
-packages. Select the fork with a `replace` directive in `go.mod`:
-
-```
-replace github.com/ory/fosite => github.com/pocket-id/fosite <version>
+```sh
+go get github.com/pocket-id/fosite
 ```
 
 See the [releases](https://github.com/pocket-id/fosite/releases) for the
@@ -50,11 +47,6 @@ make gen       # regenerate the mocks in internal/
 Ory's copyright stays on files inherited from upstream. `make format` marks
 inherited files that the fork changes and adds the Pocket ID copyright to new
 files.
-
-## Security
-
-Report vulnerabilities through the
-[Pocket ID security policy](https://github.com/pocket-id/pocket-id/security/policy).
 
 ## License
 

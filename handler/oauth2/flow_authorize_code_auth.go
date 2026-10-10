@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/fosite"
 	"github.com/ory/x/errorsx"
+	"github.com/pocket-id/fosite"
 )
 
 var (

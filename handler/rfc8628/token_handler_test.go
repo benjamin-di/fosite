@@ -14,16 +14,16 @@ import (
 
 	"go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/internal"
+	"github.com/pocket-id/fosite/token/hmac"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/storage"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/storage"
 )
 
 var hmacshaStrategyOAuth = oauth2.NewHMACSHAStrategy(

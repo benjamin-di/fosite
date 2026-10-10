@@ -9,9 +9,9 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 type OpenIDConnectImplicitHandler struct {

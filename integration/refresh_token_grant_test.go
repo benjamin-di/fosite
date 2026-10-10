@@ -13,17 +13,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/fosite/internal/gen"
 	"github.com/ory/x/uuidx"
+	"github.com/pocket-id/fosite/internal/gen"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/compose"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 type introspectionResponse struct {

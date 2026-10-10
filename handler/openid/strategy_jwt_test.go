@@ -12,9 +12,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 func TestJWTStrategy_GenerateIDToken(t *testing.T) {

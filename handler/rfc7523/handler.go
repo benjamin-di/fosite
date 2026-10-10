@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/x/errorsx"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/oauth2"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"

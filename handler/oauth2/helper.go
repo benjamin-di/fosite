@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 type HandleHelperConfigProvider interface {

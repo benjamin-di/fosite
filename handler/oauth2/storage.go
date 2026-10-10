@@ -7,7 +7,7 @@ package oauth2
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 // AuthorizeCodeStorage handles storage requests related to authorization codes.

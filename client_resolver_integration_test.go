@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"

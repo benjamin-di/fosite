@@ -12,15 +12,15 @@ import (
 
 	gomock "go.uber.org/mock/gomock"
 
-	"github.com/ory/fosite/internal"
+	"github.com/pocket-id/fosite/internal"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/pocket-id/fosite"
+	"github.com/pocket-id/fosite/handler/openid"
+	"github.com/pocket-id/fosite/handler/rfc8628"
+	"github.com/pocket-id/fosite/token/hmac"
+	"github.com/pocket-id/fosite/token/jwt"
 )
 
 func TestDeviceAuth_HandleDeviceEndpointRequest(t *testing.T) {

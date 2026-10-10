@@ -7,7 +7,7 @@ package pkce
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/pocket-id/fosite"
 )
 
 func CallValidate(ctx context.Context, challenge, method string, client fosite.Client, handler *Handler) error {
