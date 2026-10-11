@@ -236,3 +236,32 @@ func TestAccessToken(t *testing.T) {
 		}
 	}
 }
+
+func TestAccessTokenRenewsIssuedAt(t *testing.T) {
+	// The session of a refresh request is cloned from the original request, so its claims still carry the iat of the first access token
+	r := jwtValidCase(fosite.AccessToken)
+	staleIssuedAt := time.Now().UTC().Add(-time.Hour).Truncate(time.Second)
+	r.Session.(*oauth2.JWTSession).JWTClaims.IssuedAt = staleIssuedAt
+	expiresAt := r.Session.GetExpiresAt(fosite.AccessToken)
+
+	before := time.Now().UTC().Truncate(time.Second)
+	token, _, err := j.GenerateAccessToken(t.Context(), r)
+	require.NoError(t, err)
+	after := time.Now().UTC()
+
+	// The new token must be stamped with its own issuance time instead of the stale one
+	parts := strings.Split(token, ".")
+	require.Len(t, parts, 3)
+	rawPayload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	require.NoError(t, err)
+	var payload map[string]interface{}
+	require.NoError(t, json.Unmarshal(rawPayload, &payload))
+
+	iat := int64(payload["iat"].(float64))
+	assert.GreaterOrEqual(t, iat, before.Unix())
+	assert.LessOrEqual(t, iat, after.Unix())
+	assert.Equal(t, expiresAt.Unix(), int64(payload["exp"].(float64)))
+
+	// The session is persisted with the token, so its claims must match what was issued
+	assert.Equal(t, iat, r.Session.(*oauth2.JWTSession).JWTClaims.IssuedAt.Unix())
+}

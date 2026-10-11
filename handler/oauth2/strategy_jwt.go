@@ -103,12 +103,12 @@ func (h *DefaultJWTStrategy) prepareJWT(ctx context.Context, tokenType fosite.To
 	} else {
 		mapClaims := claims.
 			With(
+				time.Now().UTC(),
 				jwtSession.GetExpiresAt(tokenType),
 				requester.GetGrantedScopes(),
 				requester.GetGrantedAudience(),
 			).
 			WithDefaults(
-				time.Now().UTC(),
 				h.Config.GetAccessTokenIssuer(ctx),
 			).
 			WithScopeField(

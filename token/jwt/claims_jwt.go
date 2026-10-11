@@ -1,4 +1,5 @@
 // Copyright © 2025 Ory Corp
+// Modified by contributors to the Pocket ID fork.
 // SPDX-License-Identifier: Apache-2.0
 
 package jwt
@@ -28,12 +29,13 @@ type JWTClaimsDefaults struct {
 }
 
 type JWTClaimsContainer interface {
-	// With returns a copy of itself with expiresAt, scope, audience set to the given values.
-	With(expiry time.Time, scope, audience []string) JWTClaimsContainer
+	// With returns a copy of itself with issuedAt, expiresAt, scope, audience set to the given values.
+	// These claims describe a single token, so they are overwritten every time a token is generated from the session.
+	With(issuedAt, expiry time.Time, scope, audience []string) JWTClaimsContainer
 
-	// WithDefaults returns a copy of itself with issuedAt and issuer set to the given default values. If those
-	// values are already set in the claims, they will not be updated.
-	WithDefaults(iat time.Time, issuer string) JWTClaimsContainer
+	// WithDefaults returns a copy of itself with issuer set to the given default value. If the issuer is
+	// already set in the claims, it will not be updated.
+	WithDefaults(issuer string) JWTClaimsContainer
 
 	// WithScopeField configures how a scope field should be represented in JWT.
 	WithScopeField(scopeField JWTScopeFieldEnum) JWTClaimsContainer
@@ -56,18 +58,15 @@ type JWTClaims struct {
 	ScopeField JWTScopeFieldEnum
 }
 
-func (c *JWTClaims) With(expiry time.Time, scope, audience []string) JWTClaimsContainer {
+func (c *JWTClaims) With(issuedAt, expiry time.Time, scope, audience []string) JWTClaimsContainer {
+	c.IssuedAt = issuedAt
 	c.ExpiresAt = expiry
 	c.Scope = scope
 	c.Audience = audience
 	return c
 }
 
-func (c *JWTClaims) WithDefaults(iat time.Time, issuer string) JWTClaimsContainer {
-	if c.IssuedAt.IsZero() {
-		c.IssuedAt = iat
-	}
-
+func (c *JWTClaims) WithDefaults(issuer string) JWTClaimsContainer {
 	if c.Issuer == "" {
 		c.Issuer = issuer
 	}
