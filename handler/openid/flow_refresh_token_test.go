@@ -250,3 +250,56 @@ func TestOpenIDConnectRefreshHandler_PopulateTokenEndpointResponse(t *testing.T)
 		})
 	}
 }
+
+func TestOpenIDConnectRefreshHandler_AssignsIDTokenJTIBeforeRefreshTokenIsStored(t *testing.T) {
+	h := &openid.OpenIDConnectRefreshHandler{
+		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
+			IDTokenStrategy: mockOpenIDConnectTokenStrategyProvider{
+				strategy: openid.DefaultStrategy{
+					Signer: &jwt.DefaultSigner{
+						GetPrivateKey: func(ctx context.Context) (interface{}, error) {
+							return key, nil
+						},
+					},
+					Config: &fosite.Config{
+						MinParameterEntropy: fosite.MinParameterEntropy,
+					},
+				},
+			},
+		},
+		Config: &fosite.Config{},
+	}
+	session := &openid.DefaultSession{
+		Subject: "foo",
+		Claims: &jwt.IDTokenClaims{
+			Subject: "foo",
+			JTI:     "previous-jti",
+		},
+	}
+	areq := &fosite.AccessRequest{
+		GrantTypes: []string{"refresh_token"},
+		Request: fosite.Request{
+			GrantedScope: []string{"openid"},
+			Client: &fosite.DefaultClient{
+				GrantTypes: []string{"refresh_token"},
+			},
+			Session: session,
+		},
+	}
+
+	// The refresh token grant stores the session between these two calls, so the new jti must already be set
+	require.NoError(t, h.HandleTokenEndpointRequest(context.Background(), areq))
+	storedJTI := session.Claims.JTI
+	require.NotEmpty(t, storedJTI)
+	require.NotEqual(t, "previous-jti", storedJTI)
+
+	// The issued ID token must carry the jti that was stored with the refresh token
+	aresp := fosite.NewAccessResponse()
+	require.NoError(t, h.PopulateTokenEndpointResponse(context.Background(), areq, aresp))
+	idToken, _ := aresp.GetExtra("id_token").(string)
+	decodedIdToken, err := jwt.Parse(idToken, func(token *jwt.Token) (interface{}, error) {
+		return key.PublicKey, nil
+	})
+	require.NoError(t, err)
+	assert.Equal(t, storedJTI, decodedIdToken.Claims["jti"])
+}

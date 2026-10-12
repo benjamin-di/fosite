@@ -53,8 +53,11 @@ func (c *OpenIDConnectRefreshHandler) HandleTokenEndpointRequest(ctx context.Con
 	// We need to reset the expires at value as this would be the previous expiry.
 	sess.IDTokenClaims().ExpiresAt = time.Time{}
 
-	// These will be recomputed in PopulateTokenEndpointResponse
-	sess.IDTokenClaims().JTI = ""
+	// The refresh token is stored before PopulateTokenEndpointResponse runs, so the jti of the new ID token must be assigned here
+	// This lets storage link the refresh token to the ID token issued with it, e.g. to revoke the session for an id_token_hint
+	sess.IDTokenClaims().JTI = uuid.New().String()
+
+	// This will be recomputed in PopulateTokenEndpointResponse
 	sess.IDTokenClaims().AccessTokenHash = ""
 
 	// We are not issuing a code so there is no need for this field.
@@ -92,7 +95,10 @@ func (c *OpenIDConnectRefreshHandler) PopulateTokenEndpointResponse(ctx context.
 	}
 
 	claims.AccessTokenHash = c.GetAccessTokenHash(ctx, requester, responder)
-	claims.JTI = uuid.New().String()
+	// Keep the jti assigned in HandleTokenEndpointRequest because the stored refresh token already references it
+	if claims.JTI == "" {
+		claims.JTI = uuid.New().String()
+	}
 	claims.CodeHash = ""
 	claims.IssuedAt = time.Now().Truncate(time.Second)
 
