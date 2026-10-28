@@ -202,7 +202,7 @@ func (c *DeviceCodeTokenEndpointHandler) HandleTokenEndpointRequest(ctx context.
 	}
 
 	atLifespan := fosite.GetEffectiveLifespan(requester.GetClient(), c.getGrantType(requester), fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
-	requester.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().UTC().Add(atLifespan).Round(time.Second))
+	requester.GetSession().SetExpiresAt(fosite.AccessToken, oauth2.AccessTokenExpiresAt(atLifespan))
 
 	rtLifespan := fosite.GetEffectiveLifespan(requester.GetClient(), c.getGrantType(requester), fosite.RefreshToken, c.Config.GetRefreshTokenLifespan(ctx))
 	if rtLifespan > -1 {
