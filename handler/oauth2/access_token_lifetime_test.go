@@ -122,3 +122,66 @@ func TestJWTAccessTokenLifetime(t *testing.T) {
 		}
 	}
 }
+
+func TestJWTAdditionalGrantLifetimes(t *testing.T) {
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+	for _, grant := range []string{"implicit", "password", "client_credentials"} {
+		for _, phase := range []time.Duration{0, 499 * time.Millisecond, 500 * time.Millisecond, 999 * time.Millisecond} {
+			t.Run(fmt.Sprintf("%s/%s", grant, phase), func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					time.Sleep(phase)
+					now := time.Now().UTC()
+					ctx := context.Background()
+					config := &fosite.Config{
+						GlobalSecret: []byte(strings.Repeat("s", 32)), AccessTokenLifespan: 15 * time.Minute,
+						RefreshTokenLifespan: time.Hour, RefreshTokenScopes: []string{"offline_access"},
+						AccessTokenIssuer: "https://issuer.example", ScopeStrategy: fosite.HierarchicScopeStrategy,
+					}
+					strategies := &compose.CommonStrategyProvider{
+						CoreStrategy:     compose.NewOAuth2HMACStrategy(config),
+						AccessTokenStrat: compose.NewOAuth2RFC9068JWTStrategy(func(context.Context) (interface{}, error) { return key, nil }, config),
+					}
+					store := storage.NewMemoryStore()
+					store.Users["user"] = storage.MemoryUserRelation{Username: "user", Password: "test-password"}
+					request := fosite.NewAccessRequest(&oauth2.JWTSession{Subject: "user", JWTClaims: &jwt.JWTClaims{Subject: "user"}})
+					request.Client = &fosite.DefaultClient{ID: "client", GrantTypes: fosite.Arguments{grant}, Scopes: fosite.Arguments{"read"}, Audience: fosite.Arguments{"https://resource.example"}}
+					request.GrantTypes = fosite.Arguments{grant}
+					request.RequestedScope = fosite.Arguments{"read"}
+					request.GrantScope("read")
+					request.GrantAudience("https://resource.example")
+					var accessToken string
+					if grant == "implicit" {
+						authorize := fosite.NewAuthorizeRequest()
+						authorize.Request = request.Request
+						authorize.ResponseTypes = fosite.Arguments{"token"}
+						response := fosite.NewAuthorizeResponse()
+						handler := &oauth2.AuthorizeImplicitGrantHandler{Config: config, Storage: store, Strategy: strategies}
+						require.NoError(t, handler.HandleAuthorizeEndpointRequest(ctx, authorize, response))
+						accessToken = response.GetParameters().Get("access_token")
+					} else {
+						var handler fosite.TokenEndpointHandler
+						if grant == "password" {
+							request.Form.Set("username", "user")
+							request.Form.Set("password", "test-password")
+							handler = &oauth2.ResourceOwnerPasswordCredentialsGrantHandler{Config: config, Storage: store, Strategy: strategies}
+						} else {
+							handler = &oauth2.ClientCredentialsGrantHandler{Config: config, Storage: store, Strategy: strategies}
+						}
+						require.NoError(t, handler.HandleTokenEndpointRequest(ctx, request))
+						response := fosite.NewAccessResponse()
+						require.NoError(t, handler.PopulateTokenEndpointResponse(ctx, request, response))
+						accessToken = response.GetAccessToken()
+					}
+					payload, err := base64.RawURLEncoding.DecodeString(strings.Split(accessToken, ".")[1])
+					require.NoError(t, err)
+					var claims map[string]interface{}
+					require.NoError(t, json.Unmarshal(payload, &claims))
+					require.Equal(t, now.Unix(), int64(claims["iat"].(float64)))
+					require.Equal(t, int64(900), int64(claims["exp"].(float64))-int64(claims["iat"].(float64)))
+					require.False(t, request.GetSession().GetExpiresAt(fosite.AccessToken).After(now.Add(15*time.Minute)))
+				})
+			})
+		}
+	}
+}
